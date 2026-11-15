@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3S Pick-A-Ball | Admin Dashboard</title>
+
+    <style>
+        :root {
+            --bg-dark: #080D13;
+            --panel-bg: rgba(18, 25, 34, 0.96);
+            --panel-border: rgba(61, 169, 169, 0.28);
+
+            --accent-teal: rgb(61, 169, 169);
+            --accent-pink: rgb(247, 132, 163);
+            --accent-orange: rgb(242, 99, 23);
+
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+
+            --success-bg: rgba(61, 169, 169, 0.13);
+            --pink-bg: rgba(247, 132, 163, 0.13);
+            --orange-bg: rgba(242, 99, 23, 0.13);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 18px;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+
+        header {
+            position: relative;
+            min-height: 270px;
+            padding: 25px;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 18px;
+
+            background:
+                linear-gradient(
+                    to bottom,
+                    rgba(0,0,0,0.08),
+                    rgba(0,0,0,0.35) 40%,
+                    rgba(0,0,0,0.90) 100%
+                ),
+                url("images/court-header.jpeg");
+
+            background-size: cover;
+            background-position: center 55%;
+            background-repeat: no-repeat;
+
+            border: 1px solid var(--accent-teal);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: clamp(1.7rem, 5vw, 2.5rem);
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 3px 12px rgba(0,0,0,0.9);
+        }
+
+        header p {
+            margin: 7px 0 0;
+            color: #fff;
+            font-size: 0.9rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+        }
+
+        .header-tag {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 13px;
+            border-radius: 20px;
+            background: rgba(61,169,169,0.88);
+            color: #071113;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        /* BUTTONS */
+
+        button {
+            border: none;
+            padding: 12px 17px;
+            border-radius: 8px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        button:hover {
+            filter: brightness(1.12);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-teal);
+            color: #061416;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.10);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .btn-action {
+            background: var(--success-bg);
+            border: 1px solid var(--accent-teal);
+            color: var(--accent-teal);
+            padding: 9px 12px;
+            font-size: 0.78rem;
+        }
+
+        .btn-danger {
+            background: var(--orange-bg);
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+            padding: 9px 12px;
+            font-size: 0.78rem;
+        }
+
+        /* PANELS */
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 15px;
+            padding: 16px;
+            margin-bottom: 17px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .panel-heading h2 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--accent-teal);
+        }
+
+        /* FILTERS */
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 100%;
+            background: rgba(8,13,19,0.95);
+            color: var(--text-main);
+            border: 1px solid rgba(61,169,169,0.35);
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 0 2px rgba(247,132,163,0.12);
+        }
+
+        input[type="date"] {
+            cursor: pointer;
+            color-scheme: dark;
+        }
+
+        @media (min-width: 700px) {
+            .controls-panel {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .search-group {
+                flex-direction: row;
+            }
+
+            .search-group input {
+                flex: 1;
+            }
+        }
+
+        /* TABLE */
+
+        .table-container {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 14px 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            vertical-align: middle;
+        }
+
+        th {
+            background: rgba(61,169,169,0.09);
+            color: var(--accent-teal);
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: rgba(61,169,169,0.045);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ref-code {
+            color: var(--accent-pink);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .customer-name {
+            font-weight: 750;
+            color: #fff;
+        }
+
+        .contact-info {
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .payment-ref {
+            color: var(--accent-pink);
+            font-family: monospace;
+            font-size: 0.82rem;
+        }
+
+        .time-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-width: 160px;
+            max-width: 240px;
+        }
+
+        .badge-slot {
+            display: inline-block;
+            background: var(--success-bg);
+            border: 1px solid rgba(61,169,169,0.55);
+            color: var(--accent-teal);
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .slot-count {
+            display: inline-block;
+            background: var(--pink-bg);
+            border: 1px solid rgba(247,132,163,0.5);
+            color: var(--accent-pink);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            margin-top: 5px;
+        }
+
+        .total-fee {
+            color: var(--accent-orange);
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 7px;
+            min-width: 175px;
+        }
+
+        .no-records {
+            text-align: center;
+            padding: 35px;
+            color: var(--text-muted);
+        }
+
+        .error-message {
+            color: var(--accent-orange);
+        }
+
+        /* MOBILE CARD VIEW */
+
+        @media (max-width: 767px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                min-height: 230px;
+                padding: 19px;
+            }
+
+            .table-scroll {
+                overflow: visible;
+            }
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            table {
+                min-width: 0;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody tr {
+                margin: 12px;
+                padding: 14px;
+                border: 1px solid rgba(61,169,169,0.25);
+                border-radius: 12px;
+                background: rgba(8,13,19,0.75);
+            }
+
+            tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 10px 0;
+                border-bottom: 1px dashed rgba(255,255,255,0.08);
+                text-align: right;
+            }
+
+            tbody td::before {
+                content: attr(data-label);
+                font-weight: 800;
+                font-size: 0.68rem;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                text-align: left;
+                flex-shrink: 0;
+                padding-top: 3px;
+            }
+
+            tbody td:last-child {
+                border-bottom: none;
+                padding-top: 13px;
+            }
+
+            .time-slots {
+                justify-content: flex-end;
+                min-width: 0;
+            }
+
+            .action-buttons {
+                justify-content: flex-end;
+                min-width: 0;
+                flex-wrap: wrap;
+            }
+
+            .action-buttons button {
+                flex: 1;
+            }
+
+            .no-records {
+                display: block;
+            }
+
+            .no-records::before {
+                content: none;
+            }
+        }
+
+        /* CONFIRMATION MODAL */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 15px;
+        }
+
+        .modal-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--accent-teal);
+            padding: 21px;
+            border-radius: 16px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+        }
+
+        .modal-card h3 {
+            margin-top: 0;
+            color: var(--accent-teal);
+            font-size: 1.1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 230px;
+            background: rgba(8,13,19,0.95);
+            border: 1px solid rgba(61,169,169,0.4);
+            color: var(--text-main);
+            font-family: monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            padding: 13px;
+            border-radius: 8px;
+            resize: vertical;
+            margin-bottom: 13px;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        /* LOADING */
+
+        .loading-indicator {
+            color: var(--accent-teal);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-content">
+            <h1>3S PICK-A-BALL</h1>
+            <p>ADMIN DASHBOARD · BOOKING MANAGEMENT</p>
+            <p>Mahayahay, Cansojong, Talisay City, Cebu 6045</p>
+            <span class="header-tag">🏓 PLAY HARD. RESPECT ALL. ENJOY THE GAME.</span>
+        </div>
+    </header>
+
+    <!-- FILTERS -->
+    <section class="panel">
+        <div class="panel-heading">
+            <h2>🔎 Booking Management</h2>
+            <button class="btn-primary" id="refreshButton" onclick="fetchBookings()">
+                🔄 Refresh List
+            </button>
+        </div>
+
+        <div class="controls-panel">
+            <div class="search-group">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search customer, booking code, phone, payment ref..."
+                    oninput="filterTable()"
+                >
+
+                <input
+                    type="date"
+                    id="dateFilter"
+                    onchange="filterTable()"
+                    onclick="if(this.showPicker) this.showPicker()"
+                >
+            </div>
+
+            <button class="btn-secondary" onclick="clearFilters()">
+                Reset Filters
+            </button>
+        </div>
+    </section>
+
+    <!-- BOOKING TABLE -->
+    <section class="table-container">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ref Code</th>
+                        <th>Booking Date</th>
+                        <th>Customer</th>
+                        <th>Contact</th>
+                        <th>Reserved Time Slots</th>
+                        <th>Payment Ref</th>
+                        <th>Total Fee</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="bookingTableBody">
+                    <tr>
+                        <td colspan="8" class="no-records loading-indicator">
+                            Loading bookings from Supabase...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+<!-- CONFIRMATION MODAL -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-card">
+
+        <h3>📱 Customer Confirmation Preview</h3>
+
+        <textarea id="confirmText" readonly></textarea>
+
+        <div class="modal-actions">
+            <button class="btn-primary" onclick="copyToClipboard()">
+                📋 Copy Confirmation Message
+            </button>
+
+            <button class="btn-secondary" onclick="closeModal()">
+                Close
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // ==========================================
+    // SUPABASE CONFIGURATION
+    // ==========================================
+
+    const SUPABASE_URL =
+        'https://sbepvxarglghtfskrcve.supabase.co';
+
+    // const SUPABASE_ANON_KEY =
+    //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXB2eGFyZ2xnaHRmc2tyY3ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NjI2OTQsImV4cCI6MjEwMzAzODY5NH0.qNjxhCSsOSRGBkfhlPy7Er4SF1WsygcmuaJCnhVqwVA';
+
+    const SUPABASE_ANON_KEY =
+        'sb_publishable_Rw7fJ8L5mzzeEfYaHLDY-w_qXvKTY8W';
+
+
+    const supabaseClient = supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+    let allBookings = [];
+    let groupedBookings = [];
+
+    const monthNames = [
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ];
+
+    const dayNames = [
+        "Sunday", "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday"
+    ];
+
+
+    // ==========================================
+    // SAFE TEXT HANDLING
+    // ==========================================
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => {
+            const replacements = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+
+            return replacements[character];
+        });
+    }
+
+
+    // ==========================================
+    // DATE AND TIME FORMATTING
+    // ==========================================
+
+    function normalizeDate(dateStr) {
+        if (!dateStr) return '';
+
+        return String(dateStr).split('T')[0].trim();
+    }
+
+    function formatDateDisplay(dateStr) {
+        const normalized = normalizeDate(dateStr);
+        const parts = normalized.split('-').map(Number);
+
+        if (parts.length !== 3 || parts.some(Number.isNaN)) {
+            return normalized;
+        }
+
+        const [year, month, day] = parts;
+
+        const date = new Date(year, month - 1, day);
+
+        return `${dayNames[date.getDay()]}, ${monthNames[month - 1]} ${day}, ${year}`;
+    }
+
+    function formatTime(hour) {
+        const h = Number(hour);
+
+        const period = h >= 12 ? 'PM' : 'AM';
+
+        const displayHour =
+            h > 12 ? h - 12 : (h === 0 ? 12 : h);
+
+        return `${displayHour}:00 ${period}`;
+    }
+
+    function formatCurrency(amount) {
+        return Number(amount || 0).toLocaleString('en-PH', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    }
+
+
+    // ==========================================
+    // BOOKING GROUPING
+    // ==========================================
+
+    /*
+       A booking may consist of multiple database rows,
+       one row for every reserved hourly slot.
+
+       Group rows by booking code, payment reference,
+       phone number and booking date.
+
+       This produces ONE admin table row per reservation.
+    */
+
+    function getBookingGroupKey(item) {
+        const date = normalizeDate(item.booking_date);
+
+        const bookingCode = item.booking_code || '';
+        const paymentRef = item.payment_ref || '';
+        const phone = item.phone || '';
+
+        if (bookingCode || paymentRef) {
+            return [
+                date,
+                bookingCode,
+                paymentRef,
+                phone
+            ].join('|');
+        }
+
+        // Fallback for older records without a booking code/payment ref.
+        return `individual|${item.id}`;
+    }
+
+    function groupBookings(bookings) {
+        const groups = new Map();
+
+        bookings.forEach(item => {
+            const key = getBookingGroupKey(item);
+
+            if (!groups.has(key)) {
+                groups.set(key, {
+                    key,
+                    rows: [],
+                    firstItem: item,
+                    slots: [],
+                    ids: []
+                });
+            }
+
+            const group = groups.get(key);
+
+            group.rows.push(item);
+            group.ids.push(item.id);
+
+            const hour = Number(item.slot_hour);
+
+            if (!Number.isNaN(hour)) {
+                group.slots.push(hour);
+            }
+        });
+
+        return Array.from(groups.values()).map(group => {
+            group.rows.sort(
+                (a, b) => Number(a.slot_hour) - Number(b.slot_hour)
+            );
+
+            group.slots = [...new Set(group.slots)].sort(
+                (a, b) => a - b
+            );
+
+            group.firstItem = group.rows[0];
+
+            return group;
+        }).sort((a, b) => {
+            const dateCompare =
+                normalizeDate(b.firstItem.booking_date).localeCompare(
+                    normalizeDate(a.firstItem.booking_date)
+                );
+
+            if (dateCompare !== 0) return dateCompare;
+
+            return Number(a.firstItem.slot_hour) -
+                   Number(b.firstItem.slot_hour);
+        });
+    }
+
+
+    // ==========================================
+    // FETCH BOOKINGS
+    // ==========================================
+
+    async function fetchBookings() {
+        const tbody = document.getElementById('bookingTableBody');
+        const refreshButton = document.getElementById('refreshButton');
+
+        refreshButton.disabled = true;
+        refreshButton.textContent = '⏳ Loading...';
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="no-records loading-indicator">
+                    Fetching bookings from Supabase...
+                </td>
+            </tr>
+        `;
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('bookings')
+                .select('*')
+                .order('booking_date', { ascending: false })
+                .order('slot_hour', { ascending: true });
+
+            if (error) {
+                throw error;
+            }
+
+            allBookings = data || [];
+
+            groupedBookings = groupBookings(allBookings);
+
+            filterTable();
+
+        } catch (error) {
+            console.error('Error fetching bookings:', error);
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="no-records error-message">
+                        Error loading bookings: ${escapeHtml(error.message)}
+                    </td>
+                </tr>
+            `;
+
+        } finally {
+            refreshButton.disabled = false;
+            refreshButton.textContent = '🔄 Refresh List';
+        }
+    }
+
+
+    // ==========================================
+    // RENDER GROUPED BOOKING TABLE
+    // ==========================================
+
+    function renderTable(dataList) {
+        const tbody = document.getElementById('bookingTableBody');
+
+        tbody.innerHTML = '';
+
+        if (!dataList.length) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="no-records">
+                        No booking records found.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        dataList.forEach(group => {
+            const item = group.firstItem;
+
+            const rawCode = item.booking_code || '-';
+
+            const codeParts = rawCode.split('-');
+
+            const baseCode =
+                codeParts.length >= 2
+                    ? `${codeParts[0]}-${codeParts[1]}`
+                    : rawCode;
+
+            const slotsHtml = group.slots.map(hour => `
+                <span class="badge-slot">
+                    ${formatTime(hour)} - ${formatTime(hour + 1)}
+                </span>
+            `).join('');
+
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
+                <td data-label="Ref Code">
+                    <span class="ref-code">
+                        ${escapeHtml(baseCode)}
+                    </span>
+                </td>
+
+                <td data-label="Booking Date">
+                    ${escapeHtml(formatDateDisplay(item.booking_date))}
+                </td>
+
+                <td data-label="Customer">
+                    <span class="customer-name">
+                        ${escapeHtml(item.full_name || '-')}
+                    </span>
+                    <br>
+                    <span class="slot-count">
+                        ${group.slots.length} HOUR${group.slots.length !== 1 ? 'S' : ''}
+                    </span>
+                </td>
+
+                <td data-label="Contact">
+                    <span class="contact-info">
+                        📞 ${escapeHtml(item.phone || '-')}
+                    </span>
+                </td>
+
+                <td data-label="Reserved Time Slots">
+                    <div class="time-slots">
+                        ${slotsHtml}
+                    </div>
+                </td>
+
+                <td data-label="Payment Ref">
+                    <span class="payment-ref">
+                        ${escapeHtml(item.payment_ref || '-')}
+                    </span>
+                </td>
+
+                <td data-label="Total Fee">
+                    <span class="total-fee">
+                        ₱${formatCurrency(item.total_fee)}
+                    </span>
+                </td>
+
+                <td data-label="Actions">
+                    <div class="action-buttons">
+                        <button class="btn-action confirmation-button">
+                            📱 Confirmation
+                        </button>
+
+                        <button class="btn-danger delete-button">
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            tr.querySelector('.confirmation-button')
+                .addEventListener('click', () => {
+                    generateConfirmation(group.key);
+                });
+
+            tr.querySelector('.delete-button')
+                .addEventListener('click', () => {
+                    deleteBooking(group.key);
+                });
+
+            tbody.appendChild(tr);
+        });
+    }
+
+
+    // ==========================================
+    // CUSTOMER CONFIRMATION MESSAGE
+    // ==========================================
+
+    function generateConfirmation(groupKey) {
+        const group = groupedBookings.find(
+            booking => booking.key === groupKey
+        );
+
+        if (!group || !group.rows.length) {
+            alert('No booking details found.');
+            return;
+        }
+
+        const item = group.firstItem;
+
+        const rawCode = item.booking_code || '-';
+        const codeParts = rawCode.split('-');
+
+        const baseCode =
+            codeParts.length >= 2
+                ? `${codeParts[0]}-${codeParts[1]}`
+                : rawCode;
+
+        const timeStr = group.slots.map(hour => {
+            return `${formatTime(hour)} - ${formatTime(hour + 1)}`;
+        }).join('\n');
+
+        const confirmationMsg =
+`✅ [3S PICK-A-BALL BOOKING CONFIRMED]
+
+Ref Code: ${baseCode}
+Name: ${item.full_name || '-'}
+Contact: ${item.phone || '-'}
+Date: ${formatDateDisplay(item.booking_date)}
+
+RESERVED TIME SLOTS:
+${timeStr}
+
+Total Hours: ${group.slots.length}
+Amount Paid: ₱${formatCurrency(item.total_fee)}
+Transaction Ref: ${item.payment_ref || '-'}
+
+Account Paid To: MariBank (CHEARLIM CANEDA)
+
+Court: 3S Pick-A-Ball
+Status: CONFIRMED & RESERVED 🎉
+
+Thank you for playing with us!
+See you at the court!`;
+
+        document.getElementById('confirmText').value =
+            confirmationMsg;
+
+        document.getElementById('confirmModal').style.display =
+            'flex';
+    }
+
+
+    // ==========================================
+    // COPY CONFIRMATION
+    // ==========================================
+
+    async function copyToClipboard() {
+        const text =
+            document.getElementById('confirmText').value;
+
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                const textarea =
+                    document.getElementById('confirmText');
+
+                textarea.focus();
+                textarea.select();
+
+                const copied = document.execCommand('copy');
+
+                if (!copied) {
+                    throw new Error('Copy command failed.');
+                }
+            }
+
+            alert('Confirmation message copied successfully!');
+            closeModal();
+
+        } catch (error) {
+            console.error('Copy failed:', error);
+            alert('Unable to copy. Please select and copy the message manually.');
+        }
+    }
+
+
+    // ==========================================
+    // MODAL
+    // ==========================================
+
+    function closeModal() {
+        document.getElementById('confirmModal').style.display =
+            'none';
+    }
+
+    document.getElementById('confirmModal')
+        .addEventListener('click', event => {
+            if (event.target.id === 'confirmModal') {
+                closeModal();
+            }
+        });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+
+    // ==========================================
+    // SEARCH AND DATE FILTER
+    // ==========================================
+
+    function filterTable() {
+        const searchVal =
+            document.getElementById('searchInput')
+                .value.toLowerCase().trim();
+
+        const dateVal =
+            document.getElementById('dateFilter').value;
+
+        const filtered = groupedBookings.filter(group => {
+            const item = group.firstItem;
+
+            const searchableText = [
+                item.full_name,
+                item.booking_code,
+                item.payment_ref,
+                item.phone,
+                item.booking_date
+            ].filter(Boolean).join(' ').toLowerCase();
+
+            const matchesSearch =
+                !searchVal || searchableText.includes(searchVal);
+
+            const itemDate = normalizeDate(item.booking_date);
+
+            const matchesDate =
+                !dateVal || itemDate === dateVal;
+
+            return matchesSearch && matchesDate;
+        });
+
+        renderTable(filtered);
+    }
+
+
+    // ==========================================
+    // RESET FILTERS
+    // ==========================================
+
+    function clearFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('dateFilter').value = '';
+
+        renderTable(groupedBookings);
+    }
+
+
+    // ==========================================
+    // DELETE ENTIRE CUSTOMER RESERVATION
+    // ==========================================
+
+    async function deleteBooking(groupKey) {
+        const group = groupedBookings.find(
+            booking => booking.key === groupKey
+        );
+
+        if (!group || !group.ids.length) {
+            alert('Booking record not found.');
+            return;
+        }
+
+        const item = group.firstItem;
+
+        const confirmed = confirm(
+            `Are you sure you want to delete this entire reservation?\n\n` +
+            `Customer: ${item.full_name || '-'}\n` +
+            `Date: ${formatDateDisplay(item.booking_date)}\n` +
+            `Reserved Hours: ${group.slots.length}\n` +
+            `Payment Ref: ${item.payment_ref || '-'}\n\n` +
+            `This will delete ALL ${group.ids.length} hourly record(s) belonging to this reservation.`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const { error } = await supabaseClient
+                .from('bookings')
+                .delete()
+                .in('id', group.ids);
+
+            if (error) {
+                throw error;
+            }
+
+            alert('The complete reservation has been deleted.');
+
+            await fetchBookings();
+
+        } catch (error) {
+            console.error('Delete error:', error);
+
+            alert(`Failed to delete reservation: ${error.message}`);
+        }
+    }
+
+
+    // ==========================================
+    // INITIAL LOAD
+    // ==========================================
+
+    window.addEventListener('DOMContentLoaded', () => {
+        fetchBookings();
+    });
+
+</script>
+
+</body>
+</html>
+```
