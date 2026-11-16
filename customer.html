@@ -1,0 +1,1688 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>S and R Pickle Court - Court Reservation</title>
+
+<style>
+:root {
+    --bg-dark: #090d12;
+    --panel-bg: rgba(18, 25, 31, 0.94);
+    --panel-border: rgba(1, 146, 254, 0.55);
+    --primary-glow: #FEF708;
+    --accent-blue: #0192FE;
+    --accent-yellow: #FEF708;
+    --accent-green: #27AD18;
+    --text-main: #f8fafc;
+    --text-muted: #a7b2bd;
+    --input-bg: rgba(10, 14, 20, 0.9);
+    --input-border: rgba(1, 146, 254, 0.65);
+    --danger: #ff4545;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+#bgCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: linear-gradient(135deg,#0b1120 0%,#030712 100%);
+}
+
+.container {
+    max-width: 850px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+header {
+    position: relative;
+    min-height: 340px;
+    padding: 35px 20px;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    background:
+        linear-gradient(to bottom,rgba(0,0,0,.10),rgba(0,0,0,.35) 40%,rgba(0,0,0,.88) 100%),
+        url("images/sr-court-header.jpeg");
+    background-size: cover;
+    background-position: center 55%;
+    background-repeat: no-repeat;
+    border: 1px solid var(--accent-blue);
+    box-shadow: 0 10px 30px rgba(0,0,0,.65);
+}
+
+.brand-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.brand-logo-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-yellow);
+    box-shadow: 0 0 18px rgba(254,247,8,.35);
+}
+
+header h1 {
+    font-size: clamp(1.6rem,4vw,2.3rem);
+    margin: 0;
+    font-weight: 900;
+    background: linear-gradient(135deg,#fff 30%,var(--accent-yellow) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+header p {
+    margin: 3px 0 0;
+    font-size: .85rem;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,.9);
+    letter-spacing: .3px;
+}
+
+#scheduleNotice {
+    color: #fff;
+    background: rgba(1,146,254,.85);
+    padding: 9px 14px;
+    border-radius: 20px;
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.rules-trigger-btn {
+    background: rgba(254,247,8,.10);
+    border: 1px solid var(--accent-yellow);
+    color: var(--accent-yellow);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.rules-trigger-btn:hover {
+    background: var(--accent-yellow);
+    color: #030712;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+    background: var(--panel-bg);
+    padding: 15px 20px;
+    border-radius: 14px;
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(10px);
+    gap: 8px;
+}
+
+.step-item {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.step-item.active { color: var(--accent-yellow); }
+.step-item.completed { color: var(--accent-green); }
+
+.panel {
+    background: var(--panel-bg);
+    backdrop-filter: blur(16px);
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 15px 35px rgba(0,0,0,.6);
+    border: 1px solid var(--panel-border);
+    display: none;
+}
+
+.panel.active-step {
+    display: block;
+    animation: fadeIn .4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.form-group { margin-bottom: 16px; position: relative; }
+
+label {
+    display: block;
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+input, select {
+    width: 100%;
+    background: var(--input-bg);
+    color: var(--text-main);
+    padding: 12px 14px;
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary-glow);
+    box-shadow: 0 0 12px rgba(254,247,8,.18);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0;
+    cursor: pointer;
+}
+
+.checkbox-group input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-yellow);
+}
+
+.checkbox-group label {
+    text-transform: none;
+    font-size: .85rem;
+    color: var(--text-main);
+    margin: 0;
+    cursor: pointer;
+}
+
+.calendar-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-main);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.calendar-trigger:hover,
+.calendar-trigger.active {
+    border-color: var(--primary-glow);
+    box-shadow: 0 0 12px rgba(254,247,8,.18);
+}
+
+.calendar-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-width: 350px;
+    background: #0d121d;
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.9);
+    z-index: 100;
+    margin-top: 6px;
+}
+
+.calendar-dropdown.open { display: block; }
+
+.cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.cal-title { font-weight: 700; color: #fff; font-size: .95rem; }
+
+.cal-nav-btn {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    color: var(--text-main);
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.cal-nav-btn:hover { background: var(--accent-yellow); color: #030712; }
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 6px;
+    text-align: center;
+}
+
+.cal-day-label {
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding-bottom: 6px;
+}
+
+.cal-date-cell {
+    padding: 8px 0;
+    font-size: .85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-main);
+    user-select: none;
+}
+
+.cal-date-cell:hover:not(.disabled) {
+    background: rgba(1,146,254,.2);
+    color: var(--accent-blue);
+}
+
+.cal-date-cell.selected {
+    background: var(--accent-yellow);
+    color: #030712;
+    font-weight: 800;
+}
+
+.cal-date-cell.disabled {
+    color: rgba(255,255,255,.15);
+    cursor: not-allowed;
+}
+
+.legend-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: .8rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-box { width: 14px; height: 14px; border-radius: 4px; }
+.legend-available { background: rgba(39,173,24,.18); border: 1px solid var(--accent-green); }
+.legend-selected { background: var(--accent-yellow); border: 1px solid #fff; }
+.legend-booked { background: rgba(255,69,69,.16); border: 1px solid var(--danger); }
+
+.slots-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+    gap: 10px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.slot-pill {
+    background: rgba(39,173,24,.10);
+    border: 1px solid rgba(39,173,24,.45);
+    color: #fff;
+    padding: 12px 10px;
+    border-radius: 10px;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all .2s;
+}
+
+.slot-pill:hover:not(:disabled) {
+    background: rgba(39,173,24,.22);
+    border-color: var(--accent-green);
+}
+
+.slot-pill.selected {
+    background: var(--accent-yellow);
+    color: #030712;
+    font-weight: 800;
+    border-color: #fff;
+    box-shadow: 0 0 12px rgba(254,247,8,.35);
+}
+
+.slot-pill.booked,
+.slot-pill:disabled {
+    background: rgba(255,69,69,.13) !important;
+    border: 1px solid rgba(255,69,69,.75) !important;
+    color: #ff7777 !important;
+    cursor: not-allowed;
+    opacity: 1;
+    text-decoration: line-through;
+    box-shadow: none;
+}
+
+.summary-box {
+    background: rgba(1,146,254,.07);
+    border: 1px dashed rgba(1,146,254,.45);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 8px 0;
+}
+
+.total-highlight {
+    color: var(--accent-yellow);
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+button {
+    border: none;
+    padding: 13px 18px;
+    border-radius: 10px;
+    font-weight: 750;
+    cursor: pointer;
+    transition: .2s;
+}
+
+button:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-primary {
+    background: var(--accent-blue);
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) { filter: brightness(1.12); }
+
+.btn-secondary {
+    background: rgba(255,255,255,.10);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.15);
+}
+
+.btn-full { width: 100%; margin-top: 10px; }
+
+.rules-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.88);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.rules-modal.active { display: flex; }
+
+.rules-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--accent-blue);
+    padding: 22px;
+    border-radius: 16px;
+    max-width: 550px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.rules-card h2 { color: var(--accent-yellow); margin-top: 0; }
+.rules-card li { margin-bottom: 10px; line-height: 1.5; }
+
+.qr-container {
+    text-align: center;
+    background: rgba(255,255,255,.04);
+    border: 1px dashed var(--panel-border);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+}
+
+.qr-container img { max-width: 220px; width: 100%; border-radius: 10px; }
+
+.proof-box {
+    background: rgba(1,146,254,.07);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 18px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.status-message {
+    padding: 12px;
+    border-radius: 10px;
+    margin: 12px 0;
+    display: none;
+}
+
+.status-message.error {
+    display: block;
+    background: rgba(255,69,69,.12);
+    color: #ff8585;
+    border: 1px solid rgba(255,69,69,.4);
+}
+
+.status-message.success {
+    display: block;
+    background: rgba(39,173,24,.12);
+    color: #8de987;
+    border: 1px solid rgba(39,173,24,.4);
+}
+
+@media(max-width:600px) {
+    body { padding: 10px; }
+    header { min-height: 260px; padding: 22px 12px; }
+    .brand-logo-img { width: 55px; height: 55px; }
+    .step-indicator { padding: 12px 8px; gap: 4px; }
+    .step-item { font-size: .58rem; }
+    .panel { padding: 18px 14px; }
+    .slots-container { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+</style>
+</head>
+
+<body>
+<canvas id="bgCanvas"></canvas>
+
+<div class="container">
+
+<header>
+    <div class="brand-logo-container">
+        <img class="brand-logo-img" src="images/sr-logo.png"
+             onerror="this.style.display='none'" alt="S and R Logo">
+        <div>
+            <h1>S AND R PICKLE COURT</h1>
+            <p>COURT RESERVATION</p>
+        </div>
+    </div>
+    <p>Corazon Village, San Isidro, Talisay City, Cebu</p>
+    <p id="scheduleNotice">OPEN DAILY · 5:00 AM – 12:00 MIDNIGHT</p>
+    <button class="rules-trigger-btn" onclick="toggleRulesModal(true)">📋 Court Rules & Guidelines</button>
+</header>
+
+<div class="step-indicator">
+    <div class="step-item active" id="ind1">1. Schedule</div>
+    <div class="step-item" id="ind2">2. Details</div>
+    <div class="step-item" id="ind3">3. Payment</div>
+    <div class="step-item" id="ind4">4. Confirmation</div>
+</div>
+
+<!-- STEP 1 -->
+<section class="panel active-step" id="step1Panel">
+    <h2 class="panel-title">📅 Select Date & Time Slots</h2>
+
+    <div class="form-group">
+        <label>Select Booking Date</label>
+        <div class="calendar-trigger" id="calTrigger" onclick="toggleCalendar()">
+            <span id="selectedDateDisplay"></span>
+            <span>📅</span>
+        </div>
+        <div class="calendar-dropdown" id="calDropdown">
+            <div class="cal-header">
+                <button class="cal-nav-btn" onclick="prevMonth()">❮</button>
+                <span class="cal-title" id="calMonthYear"></span>
+                <button class="cal-nav-btn" onclick="nextMonth()">❯</button>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+        </div>
+    </div>
+
+    <div class="legend-container">
+        <div class="legend-item"><span class="legend-box legend-available"></span> Available</div>
+        <div class="legend-item"><span class="legend-box legend-selected"></span> Selected</div>
+        <div class="legend-item"><span class="legend-box legend-booked"></span> Booked / Passed / Admin Locked</div>
+    </div>
+
+    <p id="dayNotice" style="font-size:.82rem;color:var(--text-muted)"></p>
+    <div class="slots-container" id="slotsGrid"></div>
+
+    <div class="summary-box">
+        <div class="summary-row">
+            <span id="selectedSlotsCount">0 slot(s) chosen</span>
+            <span>Hourly booking</span>
+        </div>
+        <div class="summary-row">
+            <strong>Total Amount</strong>
+            <strong class="total-highlight">₱<span id="totalAmountDue">0</span></strong>
+        </div>
+    </div>
+
+    <button class="btn-primary btn-full" onclick="goToStep2()">Continue to Customer Details →</button>
+</section>
+
+<!-- STEP 2 -->
+<section class="panel" id="step2Panel">
+    <h2 class="panel-title">👤 Customer Information</h2>
+
+    <div class="form-group">
+        <label>Full Name</label>
+        <input id="fullName" type="text" placeholder="Enter your full name" autocomplete="name">
+    </div>
+
+    <div class="form-group">
+        <label>Email Address</label>
+        <input id="emailAddr" type="email" placeholder="Enter your email" autocomplete="email">
+    </div>
+
+    <div class="form-group">
+        <label>Mobile Number</label>
+        <input id="phoneNum" type="tel" maxlength="11" placeholder="09XXXXXXXXX" autocomplete="tel">
+    </div>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="acceptRules">
+        <label for="acceptRules">I have read and agree to the S and R Pickle Court rules.</label>
+    </div>
+
+    <button class="btn-secondary btn-full" onclick="goToStep(1)">← Back</button>
+    <button class="btn-primary btn-full" onclick="goToStep3()">Continue to Payment →</button>
+</section>
+
+<!-- STEP 3 -->
+<section class="panel" id="step3Panel">
+    <h2 class="panel-title">💳 Payment</h2>
+
+    <div class="summary-box">
+        <div class="summary-row"><strong>Date & Slots</strong></div>
+        <div id="paySummarySlots"></div>
+        <div class="summary-row">
+            <strong>Total Amount</strong>
+            <strong class="total-highlight">₱<span id="paySummaryTotal"></span></strong>
+        </div>
+    </div>
+
+    <div class="qr-container">
+        <h3>Scan to Pay</h3>
+        <img src="images/payment-qr.png" alt="S and R Payment QR"
+             onerror="this.style.display='none';document.getElementById('qrMissing').style.display='block'">
+        <p id="qrMissing" style="display:none;color:#ff8585">
+            Payment QR not yet uploaded. Please add your S&R payment QR image.
+        </p>
+    </div>
+
+    <div class="form-group">
+        <label>Payment Transaction Reference</label>
+        <input id="refNumber" type="text" placeholder="Enter transaction reference">
+    </div>
+
+    <div id="bookingStatus" class="status-message"></div>
+
+    <button class="btn-secondary btn-full" onclick="goToStep(2)">← Back</button>
+    <button class="btn-primary btn-full" id="completeBookingBtn" onclick="completeBooking()">
+        Submit Booking
+    </button>
+</section>
+
+<!-- STEP 4 -->
+<section class="panel" id="step4Panel">
+    <h2 class="panel-title">✅ Booking Submitted</h2>
+    <div class="proof-box" id="smsProof"></div>
+    <p style="font-size:.82rem;color:var(--text-muted)">
+        Keep your booking reference for future inquiries. Payment is not automatically verified.
+    </p>
+    <button class="btn-primary btn-full" onclick="resetFlow()">Make Another Booking</button>
+</section>
+
+</div>
+
+<!-- RULES MODAL - REQUIRED BEFORE BOOKING -->
+<div class="rules-modal active" id="rulesModal">
+    <div class="rules-card">
+        <h2>🏓 S and R Pickle Court Rules & Guidelines</h2>
+
+        <p style="color:var(--text-muted);font-size:.85rem;line-height:1.5">
+            Please read and understand the following rules before proceeding with your court reservation.
+        </p>
+
+        <ol>
+            <li>Reservations are subject to availability and successful payment.</li>
+            <li>Please arrive on time and observe your reserved schedule.</li>
+            <li>Respect other players, staff, and nearby residents.</li>
+            <li>Keep the court and surrounding areas clean.</li>
+            <li>Take care of court facilities and equipment.</li>
+            <li>Smoking and disruptive behavior are not allowed on court premises.</li>
+            <li>Children must be supervised by a responsible adult.</li>
+            <li>Players are responsible for their personal belongings.</li>
+            <li>Any cancellation or rescheduling request must be coordinated with court management.</li>
+            <li>Follow staff instructions and observe safe playing practices.</li>
+        </ol>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="modalAgreeCheck" onchange="toggleModalAgreeBtn()">
+            <label for="modalAgreeCheck">
+                I have read, understood, and agree to the S and R Pickle Court rules and guidelines.
+            </label>
+        </div>
+
+        <button class="btn-primary btn-full" id="modalAgreeBtn" disabled onclick="acceptRulesAndClose()">
+            Agree & Continue →
+        </button>
+
+        <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:12px">
+            Agreement is required before proceeding with your reservation.
+        </p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// ============================================================
+// S&R PICKLE COURT - SUPABASE CONFIGURATION
+// ============================================================
+
+const SR_SUPABASE_URL = "https://cerqspumigickihtgxqp.supabase.co";
+const SR_SUPABASE_KEY = "sb_publishable_xkYRVEwZKj1ayI-TV1F0Ag_x4UHD-YF";
+
+const SR_BOOKINGS_TABLE = "sr_bookings";
+const SR_SLOT_CONTROLS_TABLE = "sr_slot_controls";
+
+let srSupabase = null;
+
+if (
+    window.supabase &&
+    SR_SUPABASE_URL.startsWith("https://") &&
+    !SR_SUPABASE_KEY.includes("PASTE_")
+) {
+    srSupabase = window.supabase.createClient(
+        SR_SUPABASE_URL,
+        SR_SUPABASE_KEY
+    );
+}
+
+// ============================================================
+// BOOKING CONFIGURATION
+// ============================================================
+
+const OPENING_HOUR = 5;
+const CLOSING_HOUR = 24;
+const RATE_BEFORE_4PM = 250;
+const RATE_FROM_4PM = 350;
+
+let selectedDate = new Date();
+selectedDate.setHours(0,0,0,0);
+
+let currentViewMonth = selectedDate.getMonth();
+let currentViewYear = selectedDate.getFullYear();
+
+let selectedHours = [];
+let customerData = {};
+
+// Combined availability records from BOTH tables.
+// Each record includes a source and status.
+let bookedSlots = [];
+
+let realtimeChannel = null;
+let isSubmitting = false;
+let availabilityLoadVersion = 0;
+
+const monthNames = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+];
+
+const dayNames = [
+    "Sunday","Monday","Tuesday","Wednesday",
+    "Thursday","Friday","Saturday"
+];
+
+// ============================================================
+// SUPABASE CONNECTION CHECK
+// ============================================================
+
+function requireSupabase() {
+    if (!srSupabase) {
+        alert("S&R Supabase is not configured. Please check your S&R project URL and publishable key.");
+        return false;
+    }
+    return true;
+}
+
+// ============================================================
+// DATE / TIME HELPERS
+// ============================================================
+
+function getPhilippineDateTime() {
+    const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Manila",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+    }).formatToParts(new Date());
+
+    const get = type => Number(parts.find(p => p.type === type).value);
+
+    return {
+        year: get("year"),
+        month: get("month"),
+        day: get("day"),
+        hour: get("hour"),
+        minute: get("minute")
+    };
+}
+
+function getTodayPhilippineString() {
+    const n = getPhilippineDateTime();
+    return `${n.year}-${String(n.month).padStart(2,"0")}-${String(n.day).padStart(2,"0")}`;
+}
+
+function formatDateIso(dateObj) {
+    return `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,"0")}-${String(dateObj.getDate()).padStart(2,"0")}`;
+}
+
+function formatDateDisplay(dateObj) {
+    return `${dayNames[dateObj.getDay()]}, ${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
+}
+
+function formatDateStringDisplay(value) {
+    const [y,m,d] = value.split("-").map(Number);
+    return formatDateDisplay(new Date(y,m-1,d));
+}
+
+function formatTime(hour) {
+    const h = hour % 24;
+    const period = h >= 12 ? "PM" : "AM";
+    const display = h > 12 ? h-12 : (h === 0 ? 12 : h);
+    return `${display}:00 ${period}`;
+}
+
+function getHourlyRate(hour) {
+    return hour < 16 ? RATE_BEFORE_4PM : RATE_FROM_4PM;
+}
+
+function calculateTotal(hours) {
+    return hours.reduce((sum,hour) => sum + getHourlyRate(hour),0);
+}
+
+function formatCurrency(amount) {
+    return Number(amount || 0).toLocaleString("en-PH");
+}
+
+// ============================================================
+// SUPABASE AVAILABILITY - CHECK BOTH TABLES
+// ============================================================
+
+async function fetchBookedSlots(dateString) {
+    if (!requireSupabase()) return false;
+
+    const grid = document.getElementById("slotsGrid");
+    const requestVersion = ++availabilityLoadVersion;
+
+    grid.innerHTML = "<p style='color:var(--text-muted)'>Loading availability...</p>";
+
+    try {
+        const [bookingResult, controlResult] = await Promise.all([
+            srSupabase
+                .from(SR_BOOKINGS_TABLE)
+                .select("booking_date,slot_hour")
+                .eq("booking_date", dateString),
+
+            srSupabase
+                .from(SR_SLOT_CONTROLS_TABLE)
+                .select("booking_date,slot_hour,status")
+                .eq("booking_date", dateString)
+        ]);
+
+        if (bookingResult.error) throw bookingResult.error;
+        if (controlResult.error) throw controlResult.error;
+
+        // Ignore an older request if the customer has selected another date.
+        if (requestVersion !== availabilityLoadVersion) return false;
+
+        const customerBookings = (bookingResult.data || []).map(row => ({
+            booking_date: row.booking_date,
+            slot_hour: Number(row.slot_hour),
+            source: "customer",
+            status: "booked"
+        }));
+
+        const adminControls = (controlResult.data || []).map(row => ({
+            booking_date: row.booking_date,
+            slot_hour: Number(row.slot_hour),
+            source: "admin",
+            status: row.status
+        }));
+
+        // Merge both sources into one availability list.
+        bookedSlots = [...customerBookings, ...adminControls];
+
+        // Remove selected slots that are no longer available.
+        selectedHours = selectedHours.filter(hour =>
+            !isUnavailable(hour,dateString)
+        );
+
+        // Do not render an old date's result over the currently selected date.
+        if (dateString === formatDateIso(selectedDate)) {
+            renderSlots();
+        }
+
+        return true;
+
+    } catch (error) {
+        console.error("S&R Supabase availability error:", error);
+
+        if (requestVersion === availabilityLoadVersion) {
+            grid.innerHTML = `
+                <p style="color:#ff8585">
+                    Unable to load S&R availability. Please refresh or try again later.
+                </p>`;
+        }
+
+        return false;
+    }
+}
+
+// ============================================================
+// AVAILABILITY HELPERS
+// ============================================================
+
+function getSlotRecord(hour,dateString) {
+    return bookedSlots.find(slot =>
+        slot.booking_date === dateString &&
+        Number(slot.slot_hour) === Number(hour)
+    ) || null;
+}
+
+function isBooked(hour,dateString) {
+    return bookedSlots.some(slot =>
+        slot.booking_date === dateString &&
+        Number(slot.slot_hour) === Number(hour)
+    );
+}
+
+function getSlotStatus(hour,dateString) {
+    const record = getSlotRecord(hour,dateString);
+
+    if (!record) return null;
+
+    if (record.source === "admin" && record.status === "locked") {
+        return "ADMIN LOCKED";
+    }
+
+    if (record.source === "admin" && record.status === "booked") {
+        return "ADMIN BOOKED";
+    }
+
+    return "BOOKED";
+}
+
+function isPastDate(dateString) {
+    return dateString < getTodayPhilippineString();
+}
+
+function isPastSlot(hour,dateString) {
+    const now = getPhilippineDateTime();
+    const today = getTodayPhilippineString();
+
+    if (dateString < today) return true;
+    if (dateString > today) return false;
+
+    return hour < now.hour || (hour === now.hour && now.minute > 0);
+}
+
+function isUnavailable(hour,dateString) {
+    return isPastDate(dateString) ||
+        isPastSlot(hour,dateString) ||
+        isBooked(hour,dateString);
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+
+function toggleCalendar() {
+    document.getElementById("calDropdown").classList.toggle("open");
+    document.getElementById("calTrigger").classList.toggle("active");
+}
+
+document.addEventListener("click",event => {
+    const trigger = document.getElementById("calTrigger");
+    const dropdown = document.getElementById("calDropdown");
+
+    if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.remove("open");
+        trigger.classList.remove("active");
+    }
+});
+
+function renderCalendar() {
+    const grid = document.getElementById("calGrid");
+    grid.innerHTML = "";
+
+    document.getElementById("calMonthYear").textContent =
+        `${monthNames[currentViewMonth]} ${currentViewYear}`;
+
+    ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(day => {
+        const el = document.createElement("div");
+        el.className = "cal-day-label";
+        el.textContent = day;
+        grid.appendChild(el);
+    });
+
+    const firstDay = new Date(currentViewYear,currentViewMonth,1).getDay();
+    const daysInMonth = new Date(currentViewYear,currentViewMonth+1,0).getDate();
+    const today = getTodayPhilippineString();
+
+    for (let i=0;i<firstDay;i++) {
+        grid.appendChild(document.createElement("div"));
+    }
+
+    for (let day=1;day<=daysInMonth;day++) {
+        const date = new Date(currentViewYear,currentViewMonth,day);
+        const dateString = formatDateIso(date);
+        const cell = document.createElement("div");
+
+        cell.className = "cal-date-cell";
+        cell.textContent = day;
+
+        if (dateString < today) {
+            cell.classList.add("disabled");
+        } else {
+            if (dateString === formatDateIso(selectedDate)) {
+                cell.classList.add("selected");
+            }
+
+            cell.onclick = () => selectDate(date);
+        }
+
+        grid.appendChild(cell);
+    }
+
+    document.getElementById("selectedDateDisplay").textContent =
+        formatDateDisplay(selectedDate);
+}
+
+function prevMonth() {
+    currentViewMonth--;
+
+    if (currentViewMonth < 0) {
+        currentViewMonth = 11;
+        currentViewYear--;
+    }
+
+    renderCalendar();
+}
+
+function nextMonth() {
+    currentViewMonth++;
+
+    if (currentViewMonth > 11) {
+        currentViewMonth = 0;
+        currentViewYear++;
+    }
+
+    renderCalendar();
+}
+
+function selectDate(date) {
+    selectedDate = new Date(date);
+    selectedDate.setHours(0,0,0,0);
+    selectedHours = [];
+
+    renderCalendar();
+
+    document.getElementById("calDropdown").classList.remove("open");
+    document.getElementById("calTrigger").classList.remove("active");
+
+    fetchBookedSlots(formatDateIso(selectedDate));
+}
+
+// ============================================================
+// SLOT RENDERING
+// ============================================================
+
+function renderSlots() {
+    const dateString = formatDateIso(selectedDate);
+    const grid = document.getElementById("slotsGrid");
+
+    grid.innerHTML = "";
+
+    document.getElementById("dayNotice").textContent =
+        "Daily hours: 5:00 AM to 12:00 midnight. Select one or more hourly slots.";
+
+    if (isPastDate(dateString)) {
+        grid.innerHTML = "<p style='color:#ff7777'>This date is no longer available.</p>";
+        selectedHours = [];
+        updateSummary();
+        return;
+    }
+
+    selectedHours = selectedHours.filter(hour => !isUnavailable(hour,dateString));
+
+    for (let hour=OPENING_HOUR;hour<CLOSING_HOUR;hour++) {
+        const booked = isBooked(hour,dateString);
+        const past = isPastSlot(hour,dateString);
+        const unavailable = booked || past;
+        const selected = selectedHours.includes(hour);
+        const slotStatus = getSlotStatus(hour,dateString);
+
+        const pill = document.createElement("button");
+        pill.type = "button";
+        pill.className = "slot-pill";
+
+        if (selected) pill.classList.add("selected");
+
+        if (unavailable) {
+            pill.disabled = true;
+            pill.classList.add("booked");
+        }
+
+        const endHour = hour + 1;
+
+        let status = "";
+
+        if (slotStatus) {
+            status = slotStatus;
+        } else if (past) {
+            status = "PASSED";
+        }
+
+        pill.innerHTML = `
+            <div>${formatTime(hour)} - ${formatTime(endHour)}</div>
+            <div style="margin-top:5px;font-size:.75rem">
+                ₱${formatCurrency(getHourlyRate(hour))}
+            </div>
+            ${status ? `<div style="font-size:.65rem;margin-top:4px">${status}</div>` : ""}
+        `;
+
+        if (!unavailable) {
+            pill.onclick = () => toggleSlot(hour);
+        }
+
+        grid.appendChild(pill);
+    }
+
+    updateSummary();
+}
+
+function toggleSlot(hour) {
+    const dateString = formatDateIso(selectedDate);
+
+    if (isUnavailable(hour,dateString)) {
+        renderSlots();
+        return;
+    }
+
+    const index = selectedHours.indexOf(hour);
+
+    if (index >= 0) {
+        selectedHours.splice(index,1);
+    } else {
+        selectedHours.push(hour);
+    }
+
+    selectedHours.sort((a,b) => a-b);
+    renderSlots();
+}
+
+function updateSummary() {
+    document.getElementById("selectedSlotsCount").textContent =
+        `${selectedHours.length} slot(s) chosen`;
+
+    document.getElementById("totalAmountDue").textContent =
+        formatCurrency(calculateTotal(selectedHours));
+}
+
+// ============================================================
+// STEP NAVIGATION
+// ============================================================
+
+function goToStep(step) {
+    document.querySelectorAll(".panel").forEach(panel =>
+        panel.classList.remove("active-step")
+    );
+
+    document.querySelectorAll(".step-item").forEach(item =>
+        item.classList.remove("active","completed")
+    );
+
+    document.getElementById(`step${step}Panel`).classList.add("active-step");
+
+    for (let i=1;i<step;i++) {
+        document.getElementById(`ind${i}`).classList.add("completed");
+    }
+
+    document.getElementById(`ind${step}`).classList.add("active");
+
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function goToStep2() {
+    if (!selectedHours.length) {
+        alert("Please select at least one available hourly slot.");
+        return;
+    }
+
+    goToStep(2);
+}
+
+// ============================================================
+// CONTACT VALIDATION AND PAYMENT STEP
+// ============================================================
+
+async function goToStep3() {
+    const name = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("emailAddr").value.trim();
+    const phone = document.getElementById("phoneNum").value.trim();
+    const accepted = document.getElementById("acceptRules").checked;
+
+    if (!name || !email || !phone) {
+        alert("Please complete all customer information fields.");
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+
+    if (!/^09\d{9}$/.test(phone)) {
+        alert("Please enter a valid 11-digit Philippine mobile number starting with 09.");
+        return;
+    }
+
+    if (!accepted) {
+        alert("Please read and agree to the court rules.");
+        return;
+    }
+
+    if (!requireSupabase()) return;
+
+    const dateString = formatDateIso(selectedDate);
+
+    const availabilityLoaded = await fetchBookedSlots(dateString);
+
+    if (!availabilityLoaded) {
+        alert("Unable to verify slot availability. Please try again.");
+        return;
+    }
+
+    if (!selectedHours.length ||
+        selectedHours.some(hour => isUnavailable(hour,dateString))) {
+        alert("One or more selected slots are no longer available. Please review your schedule.");
+        return;
+    }
+
+    customerData = {name,email,phone};
+
+    const times = selectedHours.map(hour =>
+        `${formatTime(hour)} - ${formatTime(hour+1)}`
+    ).join(", ");
+
+    document.getElementById("paySummarySlots").textContent =
+        `${formatDateDisplay(selectedDate)} | ${times}`;
+
+    document.getElementById("paySummaryTotal").textContent =
+        formatCurrency(calculateTotal(selectedHours));
+
+    goToStep(3);
+}
+
+// ============================================================
+// DATABASE INSERT - CHECK BOTH TABLES BEFORE INSERT
+// ============================================================
+
+function generateBookingCode() {
+    const random = Math.floor(100000 + Math.random() * 900000);
+    return `SR-${random}`;
+}
+
+function showBookingStatus(message,type) {
+    const el = document.getElementById("bookingStatus");
+    el.className = `status-message ${type}`;
+    el.textContent = message;
+}
+
+async function completeBooking() {
+    if (isSubmitting) return;
+
+    if (!requireSupabase()) return;
+
+    const paymentRef = document.getElementById("refNumber").value.trim();
+
+    if (!paymentRef) {
+        alert("Please enter your payment transaction reference.");
+        return;
+    }
+
+    if (!selectedHours.length) {
+        alert("Please select at least one time slot.");
+        goToStep(1);
+        return;
+    }
+
+    const dateString = formatDateIso(selectedDate);
+
+    isSubmitting = true;
+
+    const button = document.getElementById("completeBookingBtn");
+    button.disabled = true;
+    button.textContent = "Checking availability...";
+
+    try {
+        // Check customer bookings and admin slot controls together.
+        const [bookingResult, controlResult] = await Promise.all([
+            srSupabase
+                .from(SR_BOOKINGS_TABLE)
+                .select("booking_date,slot_hour")
+                .eq("booking_date",dateString),
+
+            srSupabase
+                .from(SR_SLOT_CONTROLS_TABLE)
+                .select("booking_date,slot_hour,status")
+                .eq("booking_date",dateString)
+        ]);
+
+        if (bookingResult.error) throw bookingResult.error;
+        if (controlResult.error) throw controlResult.error;
+
+        const latestBookings = bookingResult.data || [];
+        const latestControls = controlResult.data || [];
+
+        const customerConflict = selectedHours.some(hour =>
+            latestBookings.some(row => Number(row.slot_hour) === hour)
+        );
+
+        const adminConflict = selectedHours.some(hour =>
+            latestControls.some(row =>
+                Number(row.slot_hour) === hour &&
+                ["locked","booked"].includes(row.status)
+            )
+        );
+
+        const pastConflict = selectedHours.some(hour =>
+            isPastSlot(hour,dateString)
+        );
+
+        if (customerConflict || adminConflict || pastConflict) {
+            bookedSlots = [
+                ...latestBookings.map(row => ({
+                    booking_date: row.booking_date,
+                    slot_hour: Number(row.slot_hour),
+                    source: "customer",
+                    status: "booked"
+                })),
+                ...latestControls.map(row => ({
+                    booking_date: row.booking_date,
+                    slot_hour: Number(row.slot_hour),
+                    source: "admin",
+                    status: row.status
+                }))
+            ];
+
+            renderSlots();
+
+            showBookingStatus(
+                "One or more selected slots are no longer available. This may be because the admin locked or booked the slot. Please choose another schedule.",
+                "error"
+            );
+
+            goToStep(1);
+            return;
+        }
+
+        button.textContent = "Saving booking...";
+
+        const bookingCode = generateBookingCode();
+        const totalFee = calculateTotal(selectedHours);
+
+        const rows = selectedHours.map(hour => ({
+            booking_code: bookingCode,
+            full_name: customerData.name,
+            email: customerData.email,
+            phone: customerData.phone,
+            booking_date: dateString,
+            slot_hour: hour,
+            total_fee: totalFee,
+            payment_ref: paymentRef
+        }));
+
+        const {data:insertedRows,error:insertError} = await srSupabase
+            .from(SR_BOOKINGS_TABLE)
+            .insert(rows)
+            .select();
+
+        if (insertError) {
+            if (insertError.code === "23505") {
+                await fetchBookedSlots(dateString);
+
+                showBookingStatus(
+                    "Sorry, another customer or admin action has already taken one of those slots. Please select another time.",
+                    "error"
+                );
+
+                goToStep(1);
+                return;
+            }
+
+            throw insertError;
+        }
+
+        bookedSlots = [
+            ...bookedSlots,
+            ...(insertedRows || rows).map(row => ({
+                booking_date: row.booking_date || dateString,
+                slot_hour: Number(row.slot_hour),
+                source: "customer",
+                status: "booked"
+            }))
+        ];
+
+        const times = selectedHours.map(hour =>
+            `${formatTime(hour)} - ${formatTime(hour+1)}`
+        ).join("\n");
+
+        const proofText =
+`[S AND R PICKLE COURT - BOOKING SUBMITTED]
+
+Booking Code: ${bookingCode}
+
+Name: ${customerData.name}
+Email: ${customerData.email}
+Mobile: ${customerData.phone}
+
+Date: ${formatDateDisplay(selectedDate)}
+
+Reserved Time Slots:
+${times}
+
+Total Amount: ₱${formatCurrency(totalFee)}
+Payment Reference: ${paymentRef}
+
+Court:
+S and R Pickle Court
+Corazon Village, San Isidro,
+Talisay City, Cebu
+
+STATUS: BOOKING SAVED
+
+Please keep your booking code for reference.
+Payment verification and customer notifications must be handled by the court.`;
+
+        document.getElementById("smsProof").textContent = proofText;
+
+        renderSlots();
+        goToStep(4);
+
+    } catch (error) {
+        console.error("S&R booking submission error:",error);
+
+        showBookingStatus(
+            `Unable to save your booking: ${error.message || "Please try again."}`,
+            "error"
+        );
+
+    } finally {
+        isSubmitting = false;
+        button.disabled = false;
+        button.textContent = "Submit Booking";
+    }
+}
+
+// ============================================================
+// REALTIME AVAILABILITY UPDATES - BOTH TABLES
+// ============================================================
+
+function startRealtimeUpdates() {
+    if (!srSupabase) return;
+
+    if (realtimeChannel) {
+        srSupabase.removeChannel(realtimeChannel);
+    }
+
+    realtimeChannel = srSupabase
+        .channel("sr-pickle-court-availability")
+
+        // Customer booking changes
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: SR_BOOKINGS_TABLE
+            },
+            payload => {
+                console.log("S&R customer booking changed:",payload);
+                refreshCurrentSchedule();
+            }
+        )
+
+        // Admin lock, manual booking, unlock, or removal
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: SR_SLOT_CONTROLS_TABLE
+            },
+            payload => {
+                console.log("S&R admin slot control changed:",payload);
+                refreshCurrentSchedule();
+            }
+        )
+
+        .subscribe(status => {
+            console.log("S&R Realtime status:",status);
+
+            if (status === "SUBSCRIBED") {
+                console.log("S&R live availability synchronization is active.");
+            }
+
+            if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                console.warn("S&R Realtime connection issue. Periodic refresh will help keep availability current.");
+            }
+        });
+}
+
+function refreshCurrentSchedule() {
+    const currentDate = formatDateIso(selectedDate);
+
+    fetchBookedSlots(currentDate);
+}
+
+// Polling fallback: refresh current date every 30 seconds.
+// This helps if the Realtime connection is temporarily interrupted.
+setInterval(() => {
+    if (srSupabase && !document.hidden) {
+        fetchBookedSlots(formatDateIso(selectedDate));
+    }
+},30000);
+
+// Refresh when the customer returns to the browser tab.
+document.addEventListener("visibilitychange",() => {
+    if (!document.hidden && srSupabase) {
+        fetchBookedSlots(formatDateIso(selectedDate));
+    }
+});
+
+// ============================================================
+// RULES MODAL - REQUIRED BEFORE BOOKING
+// ============================================================
+
+function toggleRulesModal(show) {
+    document.getElementById("rulesModal")
+        .classList.toggle("active", show);
+}
+
+function toggleModalAgreeBtn() {
+    const checkbox = document.getElementById("modalAgreeCheck");
+    const button = document.getElementById("modalAgreeBtn");
+
+    button.disabled = !checkbox.checked;
+}
+
+function acceptRulesAndClose() {
+    const checkbox = document.getElementById("modalAgreeCheck");
+
+    if (!checkbox.checked) {
+        alert("Please read and agree to the court rules before continuing.");
+        return;
+    }
+
+    document.getElementById("acceptRules").checked = true;
+
+    toggleRulesModal(false);
+}
+
+// ============================================================
+// RESET BOOKING FLOW
+// ============================================================
+
+function resetFlow() {
+    selectedHours = [];
+
+    selectedDate = new Date();
+    selectedDate.setHours(0,0,0,0);
+
+    currentViewMonth = selectedDate.getMonth();
+    currentViewYear = selectedDate.getFullYear();
+
+    customerData = {};
+
+    document.getElementById("fullName").value = "";
+    document.getElementById("emailAddr").value = "";
+    document.getElementById("phoneNum").value = "";
+    document.getElementById("acceptRules").checked = false;
+    document.getElementById("refNumber").value = "";
+
+    document.getElementById("bookingStatus").className = "status-message";
+    document.getElementById("bookingStatus").textContent = "";
+
+    renderCalendar();
+    fetchBookedSlots(formatDateIso(selectedDate));
+    goToStep(1);
+}
+
+// ============================================================
+// BACKGROUND ANIMATION
+// ============================================================
+
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+window.addEventListener("resize",resizeCanvas);
+resizeCanvas();
+
+const balls = Array.from({length:18},() => ({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*14+8,
+    dx:(Math.random()-.5)*1.2,
+    dy:(Math.random()-.5)*1.2,
+    opacity:Math.random()*.25+.05
+}));
+
+function animateBg() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    balls.forEach(ball => {
+        ctx.beginPath();
+        ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
+        ctx.fillStyle = `rgba(1,146,254,${ball.opacity})`;
+        ctx.fill();
+
+        ctx.strokeStyle = `rgba(254,247,8,${ball.opacity*1.5})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(ball.x-ball.r*.2,ball.y-ball.r*.2,ball.r*.3,0,Math.PI);
+        ctx.strokeStyle = `rgba(39,173,24,${ball.opacity*.8})`;
+        ctx.stroke();
+
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+
+        if (ball.x < 0 || ball.x > canvas.width) ball.dx *= -1;
+        if (ball.y < 0 || ball.y > canvas.height) ball.dy *= -1;
+    });
+
+    requestAnimationFrame(animateBg);
+}
+
+animateBg();
+
+// ============================================================
+// INITIAL LOAD
+// ============================================================
+
+window.addEventListener("load",async () => {
+    renderCalendar();
+
+    if (!requireSupabase()) {
+        document.getElementById("slotsGrid").innerHTML =
+            "<p style='color:#ff8585'>Please configure your S&R Supabase project credentials first.</p>";
+        return;
+    }
+
+    console.log("S&R Supabase Project:",SR_SUPABASE_URL);
+    console.log("S&R Customer Bookings Table:",SR_BOOKINGS_TABLE);
+    console.log("S&R Admin Slot Controls Table:",SR_SLOT_CONTROLS_TABLE);
+
+    const loaded = await fetchBookedSlots(formatDateIso(selectedDate));
+
+    if (loaded) {
+        startRealtimeUpdates();
+    }
+});
+
+// Refresh time-based slot status once per minute.
+setInterval(() => {
+    renderCalendar();
+    renderSlots();
+},60000);
+</script>
+
+</body>
+</html>

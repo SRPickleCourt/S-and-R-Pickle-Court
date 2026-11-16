@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S and R Pickle Court | Admin Dashboard</title>
+
+<style>
+:root {
+    --bg-dark:#080D13;
+    --panel-bg:rgba(18,25,34,.96);
+    --panel-border:rgba(74,144,226,.30);
+    --accent-teal:rgb(74,144,226);
+    --accent-pink:rgb(247,196,66);
+    --accent-orange:rgb(75,190,120);
+    --text-main:#F8FAFC;
+    --text-muted:#94A3B8;
+    --success-bg:rgba(74,144,226,.13);
+    --pink-bg:rgba(247,196,66,.13);
+    --orange-bg:rgba(75,190,120,.13);
+}
+
+* { box-sizing:border-box; }
+
+body {
+    font-family:Inter,system-ui,-apple-system,sans-serif;
+    margin:0;
+    padding:18px;
+    background:var(--bg-dark);
+    color:var(--text-main);
+    min-height:100vh;
+}
+
+.container { max-width:1350px; margin:0 auto; }
+
+header {
+    position:relative;
+    min-height:270px;
+    padding:25px;
+    border-radius:20px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:18px;
+    background:
+        linear-gradient(to bottom,rgba(0,0,0,.08),
+        rgba(0,0,0,.35) 40%,rgba(0,0,0,.90) 100%),
+        url("images/sr-court-header.jpeg");
+    background-size:cover;
+    background-position:center 55%;
+    background-repeat:no-repeat;
+    border:1px solid var(--accent-teal);
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+.header-content { position:relative; z-index:1; }
+
+header h1 {
+    margin:0;
+    font-size:clamp(1.7rem,5vw,2.5rem);
+    font-weight:900;
+    color:#fff;
+    text-shadow:0 3px 12px rgba(0,0,0,.9);
+}
+
+header p {
+    margin:7px 0 0;
+    color:#fff;
+    font-size:.9rem;
+    text-shadow:0 2px 8px rgba(0,0,0,.9);
+}
+
+.header-tag {
+    display:inline-block;
+    margin-top:12px;
+    padding:8px 13px;
+    border-radius:20px;
+    background:rgba(74,144,226,.88);
+    color:#071113;
+    font-size:.75rem;
+    font-weight:800;
+}
+
+button {
+    border:none;
+    padding:12px 17px;
+    border-radius:8px;
+    font-weight:750;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+button:hover { filter:brightness(1.12); transform:translateY(-1px); }
+button:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+
+.btn-primary { background:var(--accent-teal); color:#061416; }
+
+.btn-secondary {
+    background:rgba(255,255,255,.10);
+    color:#fff;
+    border:1px solid rgba(255,255,255,.15);
+}
+
+.btn-action {
+    background:var(--success-bg);
+    border:1px solid var(--accent-teal);
+    color:var(--accent-teal);
+    padding:9px 12px;
+    font-size:.78rem;
+}
+
+.btn-danger {
+    background:var(--orange-bg);
+    border:1px solid var(--accent-orange);
+    color:var(--accent-orange);
+    padding:9px 12px;
+    font-size:.78rem;
+}
+
+.btn-edit {
+    background:var(--pink-bg);
+    border:1px solid var(--accent-pink);
+    color:var(--accent-pink);
+    padding:9px 12px;
+    font-size:.78rem;
+}
+
+.panel {
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:15px;
+    padding:16px;
+    margin-bottom:17px;
+    box-shadow:0 8px 25px rgba(0,0,0,.25);
+}
+
+.panel-heading {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+}
+
+.panel-heading h2 {
+    margin:0;
+    font-size:1rem;
+    color:var(--accent-teal);
+}
+
+.controls-panel { display:flex; flex-direction:column; gap:12px; }
+.search-group { display:flex; flex-direction:column; gap:10px; flex:1; }
+
+input[type="text"], input[type="date"] {
+    width:100%;
+    background:rgba(8,13,19,.95);
+    color:var(--text-main);
+    border:1px solid rgba(74,144,226,.35);
+    padding:12px 14px;
+    border-radius:8px;
+    font-size:.9rem;
+    outline:none;
+}
+
+input:focus {
+    border-color:var(--accent-pink);
+    box-shadow:0 0 0 2px rgba(247,196,66,.12);
+}
+
+input[type="date"] { cursor:pointer; color-scheme:dark; }
+
+@media(min-width:700px) {
+    .controls-panel {
+        flex-direction:row;
+        align-items:center;
+        justify-content:space-between;
+    }
+    .search-group { flex-direction:row; }
+    .search-group input { flex:1; }
+}
+
+/* LOGIN SCREEN */
+.login-screen {
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.login-card {
+    width:100%;
+    max-width:420px;
+    padding:30px;
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:18px;
+    box-shadow:0 15px 45px rgba(0,0,0,.5);
+}
+
+.login-logo {
+    text-align:center;
+    font-size:2.3rem;
+    margin-bottom:12px;
+}
+
+.login-card h2 {
+    color:var(--accent-teal);
+    text-align:center;
+    margin:0 0 8px;
+}
+
+.login-card > p {
+    color:var(--text-muted);
+    text-align:center;
+    font-size:.85rem;
+    margin:0 0 25px;
+}
+
+.login-field { margin-bottom:16px; }
+
+.login-field label {
+    display:block;
+    color:var(--text-muted);
+    font-size:.75rem;
+    font-weight:800;
+    margin-bottom:7px;
+    text-transform:uppercase;
+}
+
+.login-field input {
+    width:100%;
+    padding:13px;
+    color:white;
+    background:rgba(8,13,19,.95);
+    border:1px solid rgba(74,144,226,.35);
+    border-radius:8px;
+    outline:none;
+    font-size:.9rem;
+}
+
+.login-field input:focus { border-color:var(--accent-teal); }
+
+.login-submit { width:100%; margin-top:8px; }
+
+.login-error {
+    display:none;
+    color:#ff7777;
+    background:rgba(255,70,70,.08);
+    border:1px solid rgba(255,70,70,.25);
+    border-radius:8px;
+    padding:10px;
+    margin-bottom:15px;
+    font-size:.8rem;
+}
+
+.login-footer {
+    margin-top:20px;
+    color:var(--text-muted);
+    font-size:.7rem;
+    text-align:center;
+}
+
+.logout-button {
+    background:rgba(255,90,90,.12);
+    border:1px solid rgba(255,90,90,.4);
+    color:#ff8585;
+    padding:9px 13px;
+    font-size:.78rem;
+}
+
+/* SUMMARY CARDS */
+.summary-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:12px;
+    margin-bottom:17px;
+}
+
+.summary-card {
+    background:rgba(8,13,19,.8);
+    border:1px solid var(--panel-border);
+    border-radius:12px;
+    padding:16px;
+}
+
+.summary-card small {
+    display:block;
+    color:var(--text-muted);
+    font-size:.7rem;
+    font-weight:800;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.summary-card strong {
+    display:block;
+    font-size:1.45rem;
+    font-weight:900;
+    overflow-wrap:anywhere;
+}
+
+.summary-card.fee strong,
+.summary-card.customer strong { color:var(--accent-orange); }
+
+.summary-card.admin strong { color:var(--accent-teal); }
+.summary-card.locked strong { color:var(--accent-pink); }
+
+/* TABLE */
+.table-container {
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+.table-scroll { overflow-x:auto; width:100%; }
+
+table {
+    width:100%;
+    min-width:1200px;
+    border-collapse:collapse;
+    text-align:left;
+    font-size:.85rem;
+}
+
+th,td {
+    padding:14px 13px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+    vertical-align:middle;
+}
+
+th {
+    background:rgba(74,144,226,.09);
+    color:var(--accent-teal);
+    text-transform:uppercase;
+    font-size:.72rem;
+    letter-spacing:.5px;
+    white-space:nowrap;
+}
+
+tbody tr:hover { background:rgba(74,144,226,.045); }
+tbody tr:last-child td { border-bottom:none; }
+
+.ref-code { color:var(--accent-pink); font-weight:800; white-space:nowrap; }
+.customer-name { font-weight:750; color:#fff; }
+.contact-info { color:var(--text-muted); white-space:nowrap; }
+.payment-ref { color:var(--accent-pink); font-family:monospace; font-size:.82rem; }
+
+.time-slots {
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    min-width:160px;
+    max-width:240px;
+}
+
+.badge-slot {
+    display:inline-block;
+    background:var(--success-bg);
+    border:1px solid rgba(74,144,226,.55);
+    color:var(--accent-teal);
+    padding:5px 8px;
+    border-radius:6px;
+    font-size:.72rem;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.slot-count {
+    display:inline-block;
+    background:var(--pink-bg);
+    border:1px solid rgba(247,196,66,.5);
+    color:var(--accent-pink);
+    padding:4px 8px;
+    border-radius:20px;
+    font-size:.7rem;
+    font-weight:800;
+    margin-top:5px;
+}
+
+.total-fee { color:var(--accent-orange); font-weight:850; white-space:nowrap; }
+
+.action-buttons {
+    display:flex;
+    gap:7px;
+    min-width:240px;
+    flex-wrap:wrap;
+}
+
+.no-records { text-align:center; padding:35px; color:var(--text-muted); }
+.error-message { color:var(--accent-orange); }
+.loading-indicator { color:var(--accent-teal); }
+
+/* FORMS AND SLOT GRIDS */
+.edit-form { display:flex; flex-direction:column; gap:14px; }
+.edit-field { display:flex; flex-direction:column; gap:7px; }
+
+.edit-field label {
+    color:var(--text-muted);
+    font-size:.78rem;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.edit-note { color:var(--text-muted); font-size:.78rem; line-height:1.5; }
+
+.admin-slot-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(175px,1fr));
+    gap:10px;
+    margin-top:12px;
+}
+
+.admin-slot-card {
+    padding:13px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+    background:rgba(8,13,19,.8);
+    min-width:0;
+    transition:.2s ease;
+}
+
+.admin-slot-card strong { display:block; margin-bottom:7px; font-size:.9rem; }
+
+.admin-slot-card small {
+    display:block;
+    color:var(--text-muted);
+    margin-bottom:10px;
+    line-height:1.5;
+    overflow-wrap:anywhere;
+}
+
+.admin-slot-card.available { border-color:rgba(75,190,120,.5); }
+.admin-slot-card.reserved { border-color:rgba(74,144,226,.65); }
+.admin-slot-card.locked { border-color:rgba(247,196,66,.65); }
+
+.admin-slot-card.selected {
+    border:2px solid var(--accent-orange);
+    background:rgba(75,190,120,.12);
+    box-shadow:0 0 0 2px rgba(75,190,120,.12);
+}
+
+.slot-status {
+    display:inline-block;
+    padding:5px 8px;
+    border-radius:6px;
+    font-size:.7rem;
+    font-weight:800;
+    margin-bottom:9px;
+}
+
+.slot-status.available { background:rgba(75,190,120,.13); color:rgb(75,190,120); }
+.slot-status.reserved { background:rgba(74,144,226,.13); color:rgb(74,144,226); }
+.slot-status.locked { background:rgba(247,196,66,.13); color:rgb(247,196,66); }
+.slot-status.selected { background:rgba(75,190,120,.18); color:rgb(75,190,120); }
+
+.slot-price {
+    display:block;
+    color:var(--accent-orange);
+    font-size:.8rem;
+    font-weight:850;
+    margin-bottom:10px;
+}
+
+.slot-select-button {
+    width:100%;
+    font-size:.75rem;
+    padding:9px;
+    background:rgba(75,190,120,.12);
+    border:1px solid rgba(75,190,120,.5);
+    color:rgb(75,190,120);
+}
+
+.slot-select-button.selected {
+    background:var(--accent-orange);
+    color:#07130c;
+    border-color:var(--accent-orange);
+}
+
+.slot-select-button:disabled {
+    background:rgba(255,255,255,.04);
+    border-color:rgba(255,255,255,.08);
+    color:var(--text-muted);
+}
+
+.schedule-legend {
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:12px 0;
+    color:var(--text-muted);
+    font-size:.75rem;
+}
+
+.legend-item { display:flex; align-items:center; gap:6px; }
+.legend-dot { width:9px; height:9px; border-radius:50%; }
+.legend-dot.green { background:rgb(75,190,120); }
+.legend-dot.blue { background:rgb(74,144,226); }
+.legend-dot.yellow { background:rgb(247,196,66); }
+
+.status-label {
+    display:inline-block;
+    padding:6px 9px;
+    border-radius:6px;
+    font-size:.68rem;
+    font-weight:850;
+    white-space:nowrap;
+}
+
+.status-customer { background:rgba(75,190,120,.13); color:rgb(75,190,120); }
+.status-admin { background:rgba(74,144,226,.15); color:rgb(74,144,226); }
+.status-locked { background:rgba(247,196,66,.15); color:rgb(247,196,66); }
+
+.selected-slot-info {
+    margin-top:13px;
+    padding:12px;
+    border:1px solid rgba(75,190,120,.35);
+    background:rgba(75,190,120,.08);
+    border-radius:9px;
+    color:var(--text-main);
+    font-size:.85rem;
+    line-height:1.6;
+}
+
+/* MODALS */
+.modal-overlay {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+    padding:15px;
+}
+
+.modal-card {
+    background:var(--panel-bg);
+    border:1px solid var(--accent-teal);
+    padding:21px;
+    border-radius:16px;
+    max-width:750px;
+    width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+    box-shadow:0 15px 50px rgba(0,0,0,.6);
+}
+
+.modal-card h3 { margin-top:0; color:var(--accent-teal); font-size:1.1rem; }
+
+textarea {
+    width:100%;
+    min-height:230px;
+    background:rgba(8,13,19,.95);
+    border:1px solid rgba(74,144,226,.4);
+    color:var(--text-main);
+    font-family:monospace;
+    font-size:.82rem;
+    line-height:1.6;
+    padding:13px;
+    border-radius:8px;
+    resize:vertical;
+    margin-bottom:13px;
+}
+
+.modal-actions { display:flex; flex-direction:column; gap:9px; }
+
+.edit-slot-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(125px,1fr));
+    gap:8px;
+    margin-top:8px;
+}
+
+.edit-slot-option {
+    padding:10px;
+    border-radius:8px;
+    border:1px solid rgba(75,190,120,.5);
+    background:rgba(75,190,120,.08);
+    color:rgb(75,190,120);
+    font-size:.75rem;
+}
+
+.edit-slot-option.selected {
+    background:var(--accent-teal);
+    color:#061416;
+    border-color:var(--accent-teal);
+}
+
+.edit-slot-option:disabled {
+    background:rgba(255,255,255,.04);
+    color:var(--text-muted);
+    border-color:rgba(255,255,255,.08);
+}
+
+@media(max-width:767px) {
+    body { padding:10px; }
+    header { min-height:230px; padding:19px; }
+    .table-scroll { overflow:visible; }
+    table,thead,tbody,th,td,tr { display:block; }
+    table { min-width:0; }
+    thead { display:none; }
+
+    tbody tr {
+        margin:12px;
+        padding:14px;
+        border:1px solid rgba(74,144,226,.25);
+        border-radius:12px;
+        background:rgba(8,13,19,.75);
+    }
+
+    tbody td {
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:12px;
+        padding:10px 0;
+        border-bottom:1px dashed rgba(255,255,255,.08);
+        text-align:right;
+    }
+
+    tbody td::before {
+        content:attr(data-label);
+        font-weight:800;
+        font-size:.68rem;
+        color:var(--text-muted);
+        text-transform:uppercase;
+        text-align:left;
+        flex-shrink:0;
+        padding-top:3px;
+    }
+
+    tbody td:last-child { border-bottom:none; padding-top:13px; }
+    .time-slots { justify-content:flex-end; min-width:0; }
+    .action-buttons { justify-content:flex-end; min-width:0; flex-wrap:wrap; }
+    .action-buttons button { flex:1; }
+    .no-records { display:block; }
+    .no-records::before { content:none; }
+    .admin-slot-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+@media(max-width:390px) {
+    .admin-slot-grid { grid-template-columns:1fr; }
+    .summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN SCREEN -->
+<section id="loginScreen" class="login-screen">
+    <div class="login-card">
+        <div class="login-logo">🏓</div>
+        <h2>S&amp;R PICKLE COURT</h2>
+        <p>Administrator Login</p>
+
+        <div id="loginError" class="login-error"></div>
+
+        <form id="loginForm">
+            <div class="login-field">
+                <label for="loginEmail">Username / Email</label>
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="admin@srpicklecourt.com"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="login-field">
+                <label for="loginPassword">Password</label>
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn-primary login-submit" id="loginButton">
+                🔐 Sign In
+            </button>
+        </form>
+
+        <div class="login-footer">Authorized administrators only</div>
+    </div>
+</section>
+
+<!-- PROTECTED ADMIN DASHBOARD -->
+<div class="container" id="dashboardApp" style="display:none;">
+
+<header>
+    <div class="header-content">
+        <h1>S&amp;R PICKLE COURT</h1>
+        <p>ADMIN DASHBOARD · BOOKING MANAGEMENT</p>
+        <p>Corazon Village, San Isidro, Talisay City, Cebu</p>
+        <span class="header-tag">🏓 PLAY HARD. RESPECT ALL. ENJOY THE GAME.</span>
+    </div>
+
+    <button class="logout-button" onclick="adminLogout()">🚪 Logout</button>
+</header>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h2>🔎 Booking Management</h2>
+        <button class="btn-primary" id="refreshButton" onclick="fetchBookings()">🔄 Refresh List</button>
+    </div>
+
+    <div class="controls-panel">
+        <div class="search-group">
+            <input type="text" id="searchInput"
+                placeholder="Search customer, booking code, phone, payment ref..."
+                oninput="filterTable()">
+            <input type="date" id="dateFilter" onchange="filterTable()">
+        </div>
+        <button class="btn-secondary" onclick="clearFilters()">Reset Filters</button>
+    </div>
+</section>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <small>Total Occupied Slots</small>
+        <strong id="summaryOccupied">0</strong>
+    </div>
+    <div class="summary-card customer">
+        <small>Customer Bookings</small>
+        <strong id="summaryCustomer">0</strong>
+    </div>
+    <div class="summary-card admin">
+        <small>Admin Bookings</small>
+        <strong id="summaryAdmin">0</strong>
+    </div>
+    <div class="summary-card locked">
+        <small>Admin Locked Slots</small>
+        <strong id="summaryLocked">0</strong>
+    </div>
+    <div class="summary-card fee">
+        <small>Total Slot Fees</small>
+        <strong id="summaryFees">₱0</strong>
+    </div>
+</div>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h2>🗓️ Manual Slot Management</h2>
+        <button class="btn-secondary" id="refreshScheduleButton" onclick="loadSlotSchedule()">🔄 Refresh Schedule</button>
+    </div>
+
+    <div class="edit-form">
+        <div class="edit-field">
+            <label for="adminSlotDate">Select Date</label>
+            <input type="date" id="adminSlotDate">
+        </div>
+
+        <div class="edit-field">
+            <label for="adminCustomerName">Customer Name (Manual Booking)</label>
+            <input type="text" id="adminCustomerName" placeholder="Required for manual booking">
+        </div>
+
+        <div class="edit-field">
+            <label for="adminCustomerPhone">Customer Phone</label>
+            <input type="text" id="adminCustomerPhone" placeholder="Optional">
+        </div>
+
+        <div class="edit-field">
+            <label for="adminSlotNote">Admin Note</label>
+            <input type="text" id="adminSlotNote" placeholder="e.g. Maintenance, private event">
+        </div>
+    </div>
+
+    <div class="panel-heading" style="margin-top:22px">
+        <h2>📋 Select a Time Slot</h2>
+        <span id="slotScheduleDate" class="edit-note"></span>
+    </div>
+
+    <p class="edit-note">
+        Click an available slot to select it. Operating hours are 5:00 AM to 12:00 midnight.
+        Each slot is one hour.
+    </p>
+
+    <div class="schedule-legend">
+        <span class="legend-item"><span class="legend-dot green"></span> Available</span>
+        <span class="legend-item"><span class="legend-dot blue"></span> Booked</span>
+        <span class="legend-item"><span class="legend-dot yellow"></span> Admin Locked</span>
+    </div>
+
+    <div id="adminSlotSchedule" class="admin-slot-grid">
+        Select a date to view the schedule.
+    </div>
+
+    <div id="selectedSlotInfo" class="selected-slot-info">
+        No time slot selected.
+    </div>
+
+    <div class="action-buttons" style="margin-top:15px">
+        <button class="btn-edit" id="lockSlotButton"
+            onclick="createAdminSlot('locked_by_admin')" disabled>🔒 Lock Slot</button>
+
+        <button class="btn-primary" id="bookSlotButton"
+            onclick="createAdminSlot('booked_by_admin')" disabled>🏓 Book Slot</button>
+    </div>
+
+    <p class="edit-note" style="margin-top:12px">
+        Admin bookings, admin locks, and customer bookings are stored in the same
+        <strong>sr_bookings</strong> table. Slot fees are calculated automatically.
+        Admin-locked slots are included in the slot-fee summary.
+    </p>
+</section>
+
+<section class="table-container">
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ref Code</th>
+                    <th>Booking Date</th>
+                    <th>Customer</th>
+                    <th>Contact</th>
+                    <th>Reserved Time</th>
+                    <th>Status</th>
+                    <th>Payment Ref</th>
+                    <th>Slot Fee</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="bookingTableBody">
+                <tr><td colspan="9" class="no-records loading-indicator">Loading S&amp;R bookings...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+</div><!-- END DASHBOARD -->
+
+<!-- CONFIRMATION MODAL -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-card">
+        <h3>📱 Customer Confirmation Preview</h3>
+        <textarea id="confirmText" readonly></textarea>
+        <div class="modal-actions">
+            <button class="btn-primary" onclick="copyToClipboard()">📋 Copy Confirmation Message</button>
+            <button class="btn-secondary" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-card">
+        <h3>✏️ Edit Reserved Time Slot</h3>
+        <p id="editBookingInfo" class="edit-note"></p>
+
+        <form class="edit-form" id="editBookingForm">
+            <input type="hidden" id="editBookingId">
+            <input type="hidden" id="editSlotHour">
+
+            <div class="edit-field">
+                <label for="editBookingDate">Booking Date</label>
+                <input type="date" id="editBookingDate" required>
+            </div>
+
+            <div class="edit-field">
+                <label>Select New Time Slot</label>
+                <p class="edit-note">Choose an available time. Occupied slots cannot be selected.</p>
+                <div id="editSlotGrid" class="edit-slot-grid"></div>
+            </div>
+
+            <p class="edit-note">Only the selected hourly record will be updated.</p>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn-primary" id="saveEditButton">💾 Save Changes</button>
+                <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// ==========================================
+// SUPABASE CONFIGURATION
+// ==========================================
+
+const SUPABASE_URL = 'https://cerqspumigickihtgxqp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_xkYRVEwZKj1ayI-TV1F0Ag_x4UHD-YF';
+const BOOKINGS_TABLE = 'sr_bookings';
+
+// IMPORTANT:
+// Replace this with the Auth UID of your administrator account.
+// Do not put the account password here.
+const ADMIN_USER_ID = 'dc0b351d-c44f-4a92-95f9-1380ceace4a1';
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    {
+        auth: {
+            persistSession:true,
+            autoRefreshToken:true,
+            detectSessionInUrl:true
+        }
+    }
+);
+
+
+// ==========================================
+// AUTHENTICATION STATE
+// ==========================================
+
+let isAdminAuthenticated = false;
+let dashboardInitialized = false;
+let realtimeChannel = null;
+
+function showLoginScreen() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboardApp').style.display = 'none';
+}
+
+function showAdminDashboard() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboardApp').style.display = 'block';
+}
+
+function showLoginError(message) {
+    const errorBox = document.getElementById('loginError');
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+}
+
+function requireAdmin() {
+    if (!isAdminAuthenticated) {
+        showLoginScreen();
+        return false;
+    }
+    return true;
+}
+
+async function verifyAdminSession() {
+    if (!ADMIN_USER_ID || ADMIN_USER_ID === 'REPLACE_WITH_YOUR_ADMIN_USER_UUID') {
+        showLoginScreen();
+        showLoginError('Admin account is not configured. Please set ADMIN_USER_ID in the HTML.');
+        return false;
+    }
+
+    const {data:{session},error} = await supabaseClient.auth.getSession();
+
+    if (error || !session) {
+        isAdminAuthenticated = false;
+        showLoginScreen();
+        return false;
+    }
+
+    if (session.user.id !== ADMIN_USER_ID) {
+        await supabaseClient.auth.signOut();
+        isAdminAuthenticated = false;
+        showLoginScreen();
+        showLoginError('This account is not authorized to access the admin dashboard.');
+        return false;
+    }
+
+    isAdminAuthenticated = true;
+    showAdminDashboard();
+    return true;
+}
+
+document.getElementById('loginForm').addEventListener('submit',async event=>{
+    event.preventDefault();
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const loginButton = document.getElementById('loginButton');
+
+    document.getElementById('loginError').style.display = 'none';
+
+    if (!ADMIN_USER_ID || ADMIN_USER_ID === 'REPLACE_WITH_YOUR_ADMIN_USER_UUID') {
+        showLoginError('Admin account is not configured. Please set ADMIN_USER_ID first.');
+        return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = '⏳ Authenticating...';
+
+    try {
+        const {data,error} = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) throw error;
+
+        if (!data.user || data.user.id !== ADMIN_USER_ID) {
+            await supabaseClient.auth.signOut();
+            throw new Error('This account is not authorized to access the admin dashboard.');
+        }
+
+        isAdminAuthenticated = true;
+        showAdminDashboard();
+        await initializeAdminDashboard();
+
+    } catch(error) {
+        console.error('Admin login error:',error);
+        showLoginError(error.message || 'Unable to sign in. Please check your credentials.');
+    } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = '🔐 Sign In';
+    }
+});
+
+async function adminLogout() {
+    if (!confirm('Are you sure you want to log out?')) return;
+
+    try {
+        if (realtimeChannel) {
+            await supabaseClient.removeChannel(realtimeChannel);
+            realtimeChannel = null;
+        }
+
+        await supabaseClient.auth.signOut();
+
+        isAdminAuthenticated = false;
+        dashboardInitialized = false;
+
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginError').style.display = 'none';
+
+        closeModal();
+        closeEditModal();
+        showLoginScreen();
+
+    } catch(error) {
+        console.error('Logout error:',error);
+        alert('Unable to log out. Please try again.');
+    }
+}
+
+// If the session expires or the user signs out in another tab,
+// return this page to the login screen.
+supabaseClient.auth.onAuthStateChange((event,session)=>{
+    if (event === 'SIGNED_OUT' || !session) {
+        isAdminAuthenticated = false;
+        dashboardInitialized = false;
+        showLoginScreen();
+    }
+});
+
+
+// ==========================================
+// OPERATING HOURS AND PRICING
+// ==========================================
+
+const OPENING_HOUR = 5;
+const CLOSING_HOUR = 23;
+
+// 5:00 AM–4:00 PM = ₱250
+// 5:00 PM–11:00 PM = ₱350
+const PRICE_BEFORE_5PM = 250;
+const PRICE_FROM_5PM = 350;
+
+let allBookings = [];
+let groupedBookings = [];
+let selectedAdminHour = null;
+
+const monthNames = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+];
+
+const dayNames = [
+    "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
+];
+
+
+// ==========================================
+// PRICING FUNCTIONS
+// ==========================================
+
+function getSlotPrice(hour) {
+    const h = Number(hour);
+
+    if (!isValidOperatingHour(h)) return 0;
+
+    return h < 17 ? PRICE_BEFORE_5PM : PRICE_FROM_5PM;
+}
+
+function calculateBookingFee(rows) {
+    return rows.reduce((total,row)=>{
+        return total + getSlotPrice(Number(row.slot_hour));
+    },0);
+}
+
+function calculateTotalFees(bookings) {
+    return bookings.reduce((total,booking)=>{
+        return total + getSlotPrice(Number(booking.slot_hour));
+    },0);
+}
+
+
+// ==========================================
+// SAFE TEXT HANDLING
+// ==========================================
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g,character=>({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#039;'
+    })[character]);
+}
+
+
+// ==========================================
+// DATE AND TIME FORMATTING
+// ==========================================
+
+function normalizeDate(dateStr) {
+    if (!dateStr) return '';
+    return String(dateStr).split('T')[0].trim();
+}
+
+function formatDateDisplay(dateStr) {
+    const normalized = normalizeDate(dateStr);
+    const parts = normalized.split('-').map(Number);
+
+    if (parts.length !== 3 || parts.some(Number.isNaN)) return normalized;
+
+    const [year,month,day] = parts;
+    const date = new Date(year,month-1,day);
+
+    return `${dayNames[date.getDay()]}, ${monthNames[month-1]} ${day}, ${year}`;
+}
+
+function formatTime(hour) {
+    const h = Number(hour);
+
+    if (h === 24) return '12:00 AM';
+
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayHour = h > 12 ? h-12 : (h===0 ? 12 : h);
+
+    return `${displayHour}:00 ${period}`;
+}
+
+function formatCurrency(amount) {
+    return Number(amount || 0).toLocaleString('en-PH',{
+        minimumFractionDigits:0,
+        maximumFractionDigits:2
+    });
+}
+
+function isValidOperatingHour(hour) {
+    return Number.isInteger(Number(hour)) &&
+        Number(hour) >= OPENING_HOUR &&
+        Number(hour) <= CLOSING_HOUR;
+}
+
+function getStatusLabel(status) {
+    switch(status) {
+        case 'locked_by_admin': return 'LOCKED BY ADMIN';
+        case 'booked_by_admin': return 'BOOKED BY ADMIN';
+        case 'booked_by_customer': return 'BOOKED BY CUSTOMER';
+        default: return status || 'UNSPECIFIED';
+    }
+}
+
+function getStatusClass(status) {
+    switch(status) {
+        case 'locked_by_admin': return 'status-locked';
+        case 'booked_by_admin': return 'status-admin';
+        default: return 'status-customer';
+    }
+}
+
+function getBookingStatus(item) {
+    return item.status || 'booked_by_customer';
+}
+
+
+// ==========================================
+// SUMMARY CARDS
+// ==========================================
+
+function updateSummary() {
+    const validBookings = allBookings.filter(item=>
+        isValidOperatingHour(Number(item.slot_hour))
+    );
+
+    const customerCount = validBookings.filter(item=>
+        getBookingStatus(item)==='booked_by_customer'
+    ).length;
+
+    const adminCount = validBookings.filter(item=>
+        getBookingStatus(item)==='booked_by_admin'
+    ).length;
+
+    const lockedCount = validBookings.filter(item=>
+        getBookingStatus(item)==='locked_by_admin'
+    ).length;
+
+    document.getElementById('summaryOccupied').textContent = validBookings.length;
+    document.getElementById('summaryCustomer').textContent = customerCount;
+    document.getElementById('summaryAdmin').textContent = adminCount;
+    document.getElementById('summaryLocked').textContent = lockedCount;
+    document.getElementById('summaryFees').textContent =
+        `₱${formatCurrency(calculateTotalFees(validBookings))}`;
+}
+
+
+// ==========================================
+// GROUP BOOKINGS
+// ==========================================
+
+function getBookingGroupKey(item) {
+    const date = normalizeDate(item.booking_date);
+    const bookingCode = item.booking_code || '';
+
+    if (bookingCode) return [date,bookingCode].join('|');
+
+    return `individual|${item.id}`;
+}
+
+function groupBookings(bookings) {
+    const groups = new Map();
+
+    bookings.forEach(item=>{
+        const key = getBookingGroupKey(item);
+
+        if (!groups.has(key)) {
+            groups.set(key,{
+                key,
+                rows:[],
+                firstItem:item,
+                slots:[]
+            });
+        }
+
+        const group = groups.get(key);
+        group.rows.push(item);
+
+        const hour = Number(item.slot_hour);
+        if (!Number.isNaN(hour)) group.slots.push(hour);
+    });
+
+    return Array.from(groups.values()).map(group=>{
+        group.rows.sort((a,b)=>Number(a.slot_hour)-Number(b.slot_hour));
+        group.slots = [...new Set(group.slots)].sort((a,b)=>a-b);
+        group.firstItem = group.rows[0];
+        return group;
+    }).sort((a,b)=>{
+        const dateCompare = normalizeDate(b.firstItem.booking_date)
+            .localeCompare(normalizeDate(a.firstItem.booking_date));
+
+        if (dateCompare !== 0) return dateCompare;
+
+        return Number(a.firstItem.slot_hour)-Number(b.firstItem.slot_hour);
+    });
+}
+
+
+// ==========================================
+// FETCH BOOKINGS
+// ==========================================
+
+async function fetchBookings() {
+    if (!requireAdmin()) return;
+
+    const tbody = document.getElementById('bookingTableBody');
+    const refreshButton = document.getElementById('refreshButton');
+
+    refreshButton.disabled = true;
+    refreshButton.textContent = '⏳ Loading...';
+
+    tbody.innerHTML = `
+        <tr><td colspan="9" class="no-records loading-indicator">
+        Fetching S&amp;R records from Supabase...</td></tr>`;
+
+    try {
+        const {data,error} = await supabaseClient
+            .from(BOOKINGS_TABLE)
+            .select('*')
+            .order('booking_date',{ascending:false})
+            .order('slot_hour',{ascending:true});
+
+        if (error) throw error;
+
+        allBookings = data || [];
+        groupedBookings = groupBookings(allBookings);
+
+        updateSummary();
+        filterTable();
+
+    } catch(error) {
+        console.error('Error fetching S&R records:',error);
+
+        tbody.innerHTML = `
+            <tr><td colspan="9" class="no-records error-message">
+            Error loading records: ${escapeHtml(error.message)}
+            </td></tr>`;
+
+    } finally {
+        refreshButton.disabled = false;
+        refreshButton.textContent = '🔄 Refresh List';
+    }
+}
+
+
+// ==========================================
+// RENDER BOOKING TABLE
+// ==========================================
+
+function renderTable(dataList) {
+    const tbody = document.getElementById('bookingTableBody');
+    tbody.innerHTML = '';
+
+    if (!dataList.length) {
+        tbody.innerHTML = `
+            <tr><td colspan="9" class="no-records">
+            No S&amp;R records found.</td></tr>`;
+        return;
+    }
+
+    dataList.forEach(group=>{
+        group.rows.forEach((slotItem,index)=>{
+            const rawCode = slotItem.booking_code || '-';
+            const hour = Number(slotItem.slot_hour);
+
+            const slotHtml = isValidOperatingHour(hour) ? `
+                <span class="badge-slot">
+                    ${formatTime(hour)} - ${formatTime(hour+1)}
+                </span>` : '-';
+
+            const status = getBookingStatus(slotItem);
+            const isCustomer = status === 'booked_by_customer';
+            const slotFee = getSlotPrice(hour);
+
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
+                <td data-label="Ref Code">
+                    <span class="ref-code">${escapeHtml(rawCode)}</span>
+                </td>
+
+                <td data-label="Booking Date">
+                    ${escapeHtml(formatDateDisplay(slotItem.booking_date))}
+                </td>
+
+                <td data-label="Customer">
+                    <span class="customer-name">
+                        ${escapeHtml(slotItem.full_name || 'Admin Reserved Slot')}
+                    </span>
+                    <br>
+                    <span class="slot-count">SLOT ${index+1} OF ${group.rows.length}</span>
+                </td>
+
+                <td data-label="Contact">
+                    <span class="contact-info">📞 ${escapeHtml(slotItem.phone || '-')}</span>
+                </td>
+
+                <td data-label="Reserved Time">
+                    <div class="time-slots">${slotHtml}</div>
+                </td>
+
+                <td data-label="Status">
+                    <span class="status-label ${getStatusClass(status)}">
+                        ${escapeHtml(getStatusLabel(status))}
+                    </span>
+                </td>
+
+                <td data-label="Payment Ref">
+                    <span class="payment-ref">${escapeHtml(slotItem.payment_ref || '-')}</span>
+                </td>
+
+                <td data-label="Slot Fee">
+                    <span class="total-fee">₱${formatCurrency(slotFee)}</span>
+                </td>
+
+                <td data-label="Actions">
+                    <div class="action-buttons">
+                        <button class="btn-edit edit-button">✏️ Edit</button>
+                        ${isCustomer ? '<button class="btn-action confirmation-button">📱 Confirmation</button>' : ''}
+                        <button class="btn-danger delete-button">
+                            ${status === 'locked_by_admin' ? '🔓 Unlock' : 'Delete Slot'}
+                        </button>
+                    </div>
+                </td>`;
+
+            tr.querySelector('.edit-button').addEventListener('click',()=>{
+                openEditModal(slotItem.id);
+            });
+
+            const confirmationButton = tr.querySelector('.confirmation-button');
+
+            if (confirmationButton) {
+                confirmationButton.addEventListener('click',()=>{
+                    generateConfirmation(group.key);
+                });
+            }
+
+            tr.querySelector('.delete-button').addEventListener('click',()=>{
+                deleteBooking(slotItem.id);
+            });
+
+            tbody.appendChild(tr);
+        });
+    });
+}
+
+
+// ==========================================
+// EDIT RECORD
+// ==========================================
+
+function openEditModal(rowId) {
+    if (!requireAdmin()) return;
+
+    const booking = allBookings.find(item=>String(item.id)===String(rowId));
+
+    if (!booking) {
+        alert('Record not found.');
+        return;
+    }
+
+    const existingHour = Number(booking.slot_hour);
+
+    if (!isValidOperatingHour(existingHour)) {
+        alert('This record is outside the current operating hours (5 AM–12 midnight).');
+        return;
+    }
+
+    document.getElementById('editBookingId').value = booking.id;
+    document.getElementById('editBookingDate').value = normalizeDate(booking.booking_date);
+    document.getElementById('editSlotHour').value = String(existingHour);
+
+    document.getElementById('editBookingInfo').textContent =
+        `Name: ${booking.full_name || '-'} | Status: ${getStatusLabel(booking.status)}`;
+
+    renderEditSlotGrid(normalizeDate(booking.booking_date),booking.id,existingHour);
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function renderEditSlotGrid(date,rowId,currentHour) {
+    const container = document.getElementById('editSlotGrid');
+    container.innerHTML = '';
+
+    for (let hour=OPENING_HOUR;hour<=CLOSING_HOUR;hour++) {
+        const occupied = allBookings.find(item=>
+            normalizeDate(item.booking_date)===date &&
+            Number(item.slot_hour)===hour &&
+            String(item.id)!==String(rowId)
+        );
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'edit-slot-option';
+
+        if (hour===Number(currentHour)) button.classList.add('selected');
+
+        button.textContent =
+            `${formatTime(hour)} - ${formatTime(hour+1)} · ₱${formatCurrency(getSlotPrice(hour))}`;
+
+        if (occupied) {
+            button.disabled = true;
+            button.title = getStatusLabel(occupied.status);
+        } else {
+            button.addEventListener('click',()=>{
+                document.getElementById('editSlotHour').value = String(hour);
+                renderEditSlotGrid(date,rowId,hour);
+            });
+        }
+
+        container.appendChild(button);
+    }
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+    document.getElementById('editBookingForm').reset();
+    document.getElementById('editSlotGrid').innerHTML = '';
+}
+
+
+// ==========================================
+// EDIT DATE CHANGE
+// ==========================================
+
+document.getElementById('editBookingDate').addEventListener('change',()=>{
+    const date = document.getElementById('editBookingDate').value;
+    const rowId = document.getElementById('editBookingId').value;
+
+    document.getElementById('editSlotHour').value = '';
+
+    renderEditSlotGrid(date,rowId,null);
+});
+
+
+// ==========================================
+// SAVE EDITED RECORD
+// ==========================================
+
+document.getElementById('editBookingForm').addEventListener('submit',async event=>{
+    event.preventDefault();
+
+    if (!requireAdmin()) return;
+
+    const rowId = document.getElementById('editBookingId').value;
+    const newDate = document.getElementById('editBookingDate').value;
+    const hourValue = document.getElementById('editSlotHour').value;
+    const newHour = Number(hourValue);
+    const saveButton = document.getElementById('saveEditButton');
+
+    if (!rowId || !newDate || hourValue==='' || !isValidOperatingHour(newHour)) {
+        alert('Please select a valid date and time between 5 AM and 11 PM.');
+        return;
+    }
+
+    const original = allBookings.find(item=>String(item.id)===String(rowId));
+
+    if (!original) {
+        alert('Record not found. Please refresh.');
+        return;
+    }
+
+    if (newDate===normalizeDate(original.booking_date) &&
+        newHour===Number(original.slot_hour)) {
+        alert('No changes were made.');
+        closeEditModal();
+        return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = '⏳ Checking...';
+
+    try {
+        const {data:conflicts,error:conflictError} = await supabaseClient
+            .from(BOOKINGS_TABLE)
+            .select('id')
+            .eq('booking_date',newDate)
+            .eq('slot_hour',newHour)
+            .neq('id',rowId)
+            .limit(1);
+
+        if (conflictError) throw conflictError;
+
+        if (conflicts?.length) {
+            alert('This time slot is already occupied.');
+            return;
+        }
+
+        const confirmed = confirm(
+            `Update this record?\n\n`+
+            `OLD: ${formatDateDisplay(original.booking_date)} | ${formatTime(original.slot_hour)}\n`+
+            `NEW: ${formatDateDisplay(newDate)} | ${formatTime(newHour)}\n`+
+            `New slot fee: ₱${formatCurrency(getSlotPrice(newHour))}`
+        );
+
+        if (!confirmed) return;
+
+        saveButton.textContent = '⏳ Saving...';
+
+        const {data,error} = await supabaseClient
+            .from(BOOKINGS_TABLE)
+            .update({
+                booking_date:newDate,
+                slot_hour:newHour,
+                total_fee:getSlotPrice(newHour)
+            })
+            .eq('id',rowId)
+            .select('id');
+
+        if (error) throw error;
+        if (!data?.length) throw new Error('No record was updated. Check UPDATE permissions.');
+
+        alert('Record updated successfully!');
+        closeEditModal();
+
+        await fetchBookings();
+        await loadSlotSchedule();
+
+    } catch(error) {
+        console.error('Update error:',error);
+        alert(`Unable to update record:\n${error.message}`);
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = '💾 Save Changes';
+    }
+});
+
+
+// ==========================================
+// CUSTOMER CONFIRMATION MESSAGE
+// ==========================================
+
+function generateConfirmation(groupKey) {
+    if (!requireAdmin()) return;
+
+    const group = groupedBookings.find(item=>item.key===groupKey);
+
+    if (!group || !group.rows.length) {
+        alert('No booking details found.');
+        return;
+    }
+
+    const item = group.firstItem;
+
+    const timeStr = group.slots.map(hour=>
+        `${formatTime(hour)} - ${formatTime(hour+1)}`
+    ).join('\n');
+
+    const groupFee = calculateBookingFee(group.rows);
+
+    const confirmationMsg =
+`✅ [S&R PICKLE COURT BOOKING CONFIRMED]
+
+Ref Code: ${item.booking_code || '-'}
+Name: ${item.full_name || '-'}
+Contact: ${item.phone || '-'}
+Date: ${formatDateDisplay(item.booking_date)}
+
+RESERVED TIME SLOTS:
+${timeStr}
+
+Total Hours: ${group.slots.length}
+Total Fee: ₱${formatCurrency(groupFee)}
+Transaction Ref: ${item.payment_ref || '-'}
+
+Court: S&R Pickle Court
+Status: CONFIRMED & RESERVED 🎉
+
+Thank you for playing with us!
+See you at the court!`;
+
+    document.getElementById('confirmText').value = confirmationMsg;
+    document.getElementById('confirmModal').style.display = 'flex';
+}
+
+
+// ==========================================
+// COPY CONFIRMATION
+// ==========================================
+
+async function copyToClipboard() {
+    if (!requireAdmin()) return;
+
+    const text = document.getElementById('confirmText').value;
+
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            const textarea = document.getElementById('confirmText');
+            textarea.focus();
+            textarea.select();
+
+            if (!document.execCommand('copy')) {
+                throw new Error('Copy command failed.');
+            }
+        }
+
+        alert('Confirmation copied successfully!');
+        closeModal();
+
+    } catch(error) {
+        console.error('Copy failed:',error);
+        alert('Unable to copy. Please copy the message manually.');
+    }
+}
+
+function closeModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+}
+
+
+// ==========================================
+// DELETE OR UNLOCK ONE RECORD
+// ==========================================
+
+async function deleteBooking(rowId) {
+    if (!requireAdmin()) return;
+
+    const booking = allBookings.find(item=>String(item.id)===String(rowId));
+
+    if (!booking) {
+        alert('Record not found.');
+        return;
+    }
+
+    const status = getBookingStatus(booking);
+    const isLocked = status === 'locked_by_admin';
+
+    const confirmed = confirm(
+        `${isLocked ? 'Unlock' : 'Delete'} this time slot?\n\n`+
+        `Name: ${booking.full_name || '-'}\n`+
+        `Date: ${formatDateDisplay(booking.booking_date)}\n`+
+        `Time: ${formatTime(booking.slot_hour)} - ${formatTime(Number(booking.slot_hour)+1)}\n`+
+        `Slot Fee: ₱${formatCurrency(getSlotPrice(booking.slot_hour))}\n`+
+        `Status: ${getStatusLabel(status)}\n\n`+
+        `This will permanently remove this hourly record.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const {data,error} = await supabaseClient
+            .from(BOOKINGS_TABLE)
+            .delete()
+            .eq('id',rowId)
+            .select('id');
+
+        if (error) throw error;
+        if (!data?.length) throw new Error('No record was deleted. Check DELETE permissions.');
+
+        alert(isLocked
+            ? 'Admin lock removed. The slot is available again.'
+            : 'Booking record deleted successfully.');
+
+        await fetchBookings();
+        await loadSlotSchedule();
+
+    } catch(error) {
+        console.error('Delete error:',error);
+        alert(`Unable to delete record:\n${error.message}`);
+    }
+}
+
+
+// ==========================================
+// SEARCH AND FILTER
+// ==========================================
+
+function filterTable() {
+    if (!requireAdmin()) return;
+
+    const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+    const dateVal = document.getElementById('dateFilter').value;
+
+    const filtered = groupedBookings.filter(group=>{
+        const item = group.firstItem;
+
+        const searchableText = group.rows.map(row=>[
+            row.full_name,
+            row.booking_code,
+            row.payment_ref,
+            row.phone,
+            row.booking_date,
+            row.status
+        ].filter(Boolean).join(' ')).join(' ').toLowerCase();
+
+        return (!searchVal || searchableText.includes(searchVal)) &&
+            (!dateVal || normalizeDate(item.booking_date)===dateVal);
+    });
+
+    renderTable(filtered);
+}
+
+function clearFilters() {
+    if (!requireAdmin()) return;
+
+    document.getElementById('searchInput').value = '';
+    document.getElementById('dateFilter').value = '';
+    renderTable(groupedBookings);
+}
+
+
+// ==========================================
+// ADMIN SLOT MANAGEMENT
+// ==========================================
+
+function getAdminSlotDate() {
+    return document.getElementById('adminSlotDate').value;
+}
+
+function updateSelectedSlotInfo() {
+    const info = document.getElementById('selectedSlotInfo');
+    const lockButton = document.getElementById('lockSlotButton');
+    const bookButton = document.getElementById('bookSlotButton');
+
+    if (selectedAdminHour===null) {
+        info.textContent = 'No time slot selected. Please click an available slot.';
+        lockButton.disabled = true;
+        bookButton.disabled = true;
+        return;
+    }
+
+    const hour = Number(selectedAdminHour);
+
+    info.innerHTML =
+        `<strong>Selected Slot:</strong> ${formatTime(hour)} - ${formatTime(hour+1)}
+         <br><strong>Slot Fee:</strong> ₱${formatCurrency(getSlotPrice(hour))}`;
+
+    lockButton.disabled = false;
+    bookButton.disabled = false;
+}
+
+async function loadSlotSchedule() {
+    if (!requireAdmin()) return;
+
+    const date = getAdminSlotDate();
+    const container = document.getElementById('adminSlotSchedule');
+    const dateLabel = document.getElementById('slotScheduleDate');
+    const refreshButton = document.getElementById('refreshScheduleButton');
+
+    if (!date) {
+        container.textContent = 'Please select a date first.';
+        return;
+    }
+
+    selectedAdminHour = null;
+    updateSelectedSlotInfo();
+
+    refreshButton.disabled = true;
+    refreshButton.textContent = '⏳ Loading...';
+    container.textContent = 'Loading schedule...';
+    dateLabel.textContent = formatDateDisplay(date);
+
+    try {
+        const {data,error} = await supabaseClient
+            .from(BOOKINGS_TABLE)
+            .select('*')
+            .eq('booking_date',date)
+            .gte('slot_hour',OPENING_HOUR)
+            .lte('slot_hour',CLOSING_HOUR)
+            .order('slot_hour',{ascending:true});
+
+        if (error) throw error;
+
+        renderAdminSlotSchedule(date,data || []);
+
+    } catch(error) {
+        console.error('Schedule loading error:',error);
+        container.textContent = `Unable to load schedule: ${error.message}`;
+    } finally {
+        refreshButton.disabled = false;
+        refreshButton.textContent = '🔄 Refresh Schedule';
+    }
+}
+
+function selectAdminSlot(hour) {
+    if (!requireAdmin()) return;
+
+    const date = getAdminSlotDate();
+
+    const occupied = allBookings.find(item=>
+        normalizeDate(item.booking_date)===date &&
+        Number(item.slot_hour)===Number(hour)
+    );
+
+    if (occupied) {
+        alert('This slot is already occupied.');
+        return;
+    }
+
+    selectedAdminHour = Number(hour);
+
+    renderAdminSlotSchedule(
+        date,
+        allBookings.filter(item=>
+            normalizeDate(item.booking_date)===date &&
+            isValidOperatingHour(Number(item.slot_hour))
+        )
+    );
+
+    updateSelectedSlotInfo();
+}
+
+
+// ==========================================
+// RENDER DAILY CLICKABLE SCHEDULE
+// ==========================================
+
+function renderAdminSlotSchedule(date,bookings) {
+    const container = document.getElementById('adminSlotSchedule');
+    container.innerHTML = '';
+
+    for (let hour=OPENING_HOUR;hour<=CLOSING_HOUR;hour++) {
+        const booking = bookings.find(item=>Number(item.slot_hour)===hour);
+
+        const card = document.createElement('div');
+        card.className = 'admin-slot-card';
+
+        const price = getSlotPrice(hour);
+
+        if (booking) {
+            const recordStatus = getBookingStatus(booking);
+
+            let status = 'reserved';
+            let statusText = 'BOOKED';
+            let details = '';
+
+            if (recordStatus==='locked_by_admin') {
+                status = 'locked';
+                statusText = 'LOCKED BY ADMIN';
+                details = booking.admin_note || 'Manually locked by admin';
+            } else if (recordStatus==='booked_by_admin') {
+                status = 'reserved';
+                statusText = 'BOOKED BY ADMIN';
+                details = `Customer: ${booking.full_name || 'Admin reservation'}`;
+
+                if (booking.phone) details += `<br>Phone: ${booking.phone}`;
+                if (booking.admin_note) details += `<br>Note: ${booking.admin_note}`;
+            } else {
+                status = 'reserved';
+                statusText = 'BOOKED BY CUSTOMER';
+                details = `Customer: ${booking.full_name || 'Customer reservation'}`;
+            }
+
+            card.classList.add(status);
+
+            card.innerHTML = `
+                <span class="slot-status ${status}">${statusText}</span>
+                <strong>${formatTime(hour)} - ${formatTime(hour+1)}</strong>
+                <span class="slot-price">₱${formatCurrency(price)} / hour</span>
+                <small>${escapeHtml(details).replace(/&lt;br&gt;/g,'<br>')}</small>`;
+
+            const removeButton = document.createElement('button');
+            removeButton.className = 'btn-danger';
+            removeButton.textContent =
+                recordStatus==='locked_by_admin' ? '🔓 Unlock Slot' : 'Delete Reservation';
+
+            removeButton.addEventListener('click',()=>{
+                deleteBooking(booking.id);
+            });
+
+            card.appendChild(removeButton);
+
+        } else {
+            card.classList.add('available');
+
+            const isSelected = selectedAdminHour===hour;
+
+            if (isSelected) card.classList.add('selected');
+
+            card.innerHTML = `
+                <span class="slot-status ${isSelected?'selected':'available'}">
+                    ${isSelected?'SELECTED':'AVAILABLE'}
+                </span>
+                <strong>${formatTime(hour)} - ${formatTime(hour+1)}</strong>
+                <span class="slot-price">₱${formatCurrency(price)} / hour</span>
+                <small>${isSelected
+                    ? 'This slot is currently selected.'
+                    : 'Click below to select this slot.'
+                }</small>`;
+
+            const selectButton = document.createElement('button');
+            selectButton.className = `slot-select-button ${isSelected?'selected':''}`;
+            selectButton.textContent = isSelected ? '✓ Selected' : 'Select Slot';
+
+            selectButton.addEventListener('click',()=>{
+                selectAdminSlot(hour);
+            });
+
+            card.appendChild(selectButton);
+        }
+
+        container.appendChild(card);
+    }
+
+    updateSelectedSlotInfo();
+}
+
+
+// ==========================================
+// CREATE ADMIN LOCK OR ADMIN BOOKING
+// ==========================================
+
+async function createAdminSlot(status) {
+    if (!requireAdmin()) return;
+
+    const date = getAdminSlotDate();
+
+    const customerName = document.getElementById('adminCustomerName').value.trim();
+    const customerPhone = document.getElementById('adminCustomerPhone').value.trim();
+    const adminNote = document.getElementById('adminSlotNote').value.trim();
+
+    const lockButton = document.getElementById('lockSlotButton');
+    const bookButton = document.getElementById('bookSlotButton');
+
+    if (!date || selectedAdminHour===null) {
+        alert('Please select a date and an available time slot.');
+        return;
+    }
+
+    const hour = Number(selectedAdminHour);
+
+    if (!isValidOperatingHour(hour)) {
+        alert('Invalid time slot. S&R operating hours are 5 AM to 12 midnight.');
+        return;
+    }
+
+    if (status==='booked_by_admin' && !customerName) {
+        alert('Please enter the customer name for an admin booking.');
+        return;
+    }
+
+    const slotPrice = getSlotPrice(hour);
+    const button = status==='locked_by_admin' ? lockButton : bookButton;
+
+    lockButton.disabled = true;
+    bookButton.disabled = true;
+    button.textContent = '⏳ Processing...';
+
+    try {
+        const {data:existing,error:checkError} = await supabaseClient
+            .from(BOOKINGS_TABLE)
+            .select('id,status')
+            .eq('booking_date',date)
+            .eq('slot_hour',hour)
+            .limit(1);
+
+        if (checkError) throw checkError;
+
+        if (existing?.length) {
+            alert(`This time slot is already occupied (${getStatusLabel(existing[0].status)}).`);
+            await fetchBookings();
+            await loadSlotSchedule();
+            return;
+        }
+
+        const actionName = status==='locked_by_admin' ? 'LOCK' : 'BOOK';
+
+        const confirmed = confirm(
+            `Confirm admin ${actionName.toLowerCase()}?\n\n`+
+            `Date: ${formatDateDisplay(date)}\n`+
+            `Time: ${formatTime(hour)} - ${formatTime(hour+1)}\n`+
+            `Slot Fee: ₱${formatCurrency(slotPrice)}\n`+
+            `Status: ${getStatusLabel(status)}\n`+
+            `Customer: ${customerName || 'N/A'}\n`+
+            `Note: ${adminNote || 'None'}`
+        );
+
+        if (!confirmed) return;
+
+        const adminReference =
+            `SR-ADMIN-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+
+        const insertRecord = {
+            booking_code:adminReference,
+            full_name:status==='locked_by_admin' ? 'ADMIN LOCKED SLOT' : customerName,
+            email:null,
+            phone:customerPhone || null,
+            booking_date:date,
+            slot_hour:hour,
+            total_fee:slotPrice,
+            payment_ref:null,
+            status:status,
+            admin_note:adminNote || null
+        };
+
+        const {data,error} = await supabaseClient
+            .from(BOOKINGS_TABLE)
+            .insert(insertRecord)
+            .select('id');
+
+        if (error) {
+            if (error.code==='23505') throw new Error('This time slot is already occupied.');
+            throw error;
+        }
+
+        if (!data?.length) throw new Error('No admin record was created.');
+
+        alert(status==='locked_by_admin'
+            ? `Time slot successfully locked!\nSlot fee counted: ₱${formatCurrency(slotPrice)}`
+            : `Admin reservation successfully saved!\nSlot fee: ₱${formatCurrency(slotPrice)}`
+        );
+
+        selectedAdminHour = null;
+
+        document.getElementById('adminCustomerName').value = '';
+        document.getElementById('adminCustomerPhone').value = '';
+        document.getElementById('adminSlotNote').value = '';
+
+        await fetchBookings();
+        await loadSlotSchedule();
+
+    } catch(error) {
+        console.error('Admin slot action error:',error);
+        alert(`Unable to manage slot:\n${error.message}`);
+    } finally {
+        lockButton.disabled = false;
+        bookButton.disabled = false;
+        lockButton.textContent = '🔒 Lock Slot';
+        bookButton.textContent = '🏓 Book Slot';
+        updateSelectedSlotInfo();
+    }
+}
+
+
+// ==========================================
+// MODAL EVENTS
+// ==========================================
+
+document.getElementById('confirmModal').addEventListener('click',event=>{
+    if (event.target.id==='confirmModal') closeModal();
+});
+
+document.getElementById('editModal').addEventListener('click',event=>{
+    if (event.target.id==='editModal') closeEditModal();
+});
+
+document.addEventListener('keydown',event=>{
+    if (event.key==='Escape') {
+        closeModal();
+        closeEditModal();
+    }
+});
+
+document.getElementById('adminSlotDate').addEventListener('change',()=>{
+    selectedAdminHour = null;
+    loadSlotSchedule();
+});
+
+
+// ==========================================
+// REALTIME UPDATES
+// ==========================================
+
+function startRealtimeUpdates() {
+    if (!requireAdmin()) return;
+
+    if (realtimeChannel) {
+        supabaseClient.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+    }
+
+    realtimeChannel = supabaseClient
+        .channel('sr-admin-booking-updates')
+        .on('postgres_changes',{
+            event:'*',
+            schema:'public',
+            table:BOOKINGS_TABLE
+        },async()=>{
+            if (!isAdminAuthenticated) return;
+
+            await fetchBookings();
+            await loadSlotSchedule();
+        })
+        .subscribe(status=>{
+            console.log('S&R admin realtime:',status);
+        });
+}
+
+
+// ==========================================
+// INITIALIZE ADMIN DASHBOARD
+// ==========================================
+
+async function initializeAdminDashboard() {
+    if (!isAdminAuthenticated || dashboardInitialized) return;
+
+    dashboardInitialized = true;
+
+    const today = new Date();
+
+    const localToday = [
+        today.getFullYear(),
+        String(today.getMonth()+1).padStart(2,'0'),
+        String(today.getDate()).padStart(2,'0')
+    ].join('-');
+
+    const dateInput = document.getElementById('adminSlotDate');
+
+    if (!dateInput.value) dateInput.value = localToday;
+
+    updateSelectedSlotInfo();
+
+    await fetchBookings();
+    await loadSlotSchedule();
+
+    startRealtimeUpdates();
+}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+    showLoginScreen();
+
+    const authenticated = await verifyAdminSession();
+
+    if (authenticated) {
+        await initializeAdminDashboard();
+    }
+});
+</script>
+
+</body>
+</html>
